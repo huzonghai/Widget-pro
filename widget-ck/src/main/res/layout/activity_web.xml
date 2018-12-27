@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <com.ck.newssdk.ui.web.MyScrollView
+        android:id="@+id/web_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="45dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/ic_up" />
+
+                <TextView
+                    android:id="@+id/slide_up_into_quick_browsing_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="-5dp"
+                    android:text="@string/slide_up_into_quick_browsing_mode"
+                    android:textColor="#000000" />
+
+                <CheckBox
+                    android:id="@+id/web_select_browsing_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/slide_up_into_quick_browsing_mode"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="5dp"
+                    android:button="@drawable/select_cb_check_state"
+                    android:paddingLeft="5dp"
+                    android:text="@string/always_use_the_quick_browsing_mode"
+                    android:textColor="@color/F999999" />
+            </LinearLayout>
+
+            <WebView
+                android:id="@+id/web_web_view_coolook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <WebView
+                android:id="@+id/web_web_view_oragin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <include
+                layout="@layout/ad_layout"
+                android:visibility="gone"/>
+
+            <include
+                layout="@layout/related_articles_layout"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </com.ck.newssdk.ui.web.MyScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+        <CheckedTextView
+            android:id="@+id/web_quick_borwsing_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="6"
+            android:background="@drawable/web_buttom_selector"
+            android:checked="false"
+            android:gravity="center"
+            android:text="Quick browsing mode"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/web_back_home_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="7dp"
+            android:src="@drawable/ic_home_btn_click" />
+
+    </LinearLayout>
+
+</RelativeLayout>

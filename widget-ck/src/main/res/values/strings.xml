@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">NewsSDK</string>
+
+    <string name="brvah_loading">Loading...</string>
+    <string name="brvah_load_failed">load more failed</string>
+    <string name="brvah_load_end">No more data</string>
+    <string name="cancel">Cancel</string>
+    <string name="font_size">Font size</string>
+    <string name="slide_up_into_quick_browsing_mode">Slide up into quick browsing mode</string>
+    <string name="always_use_the_quick_browsing_mode">Always use the quick browsing mode</string>
+
+    <string name="recommended">Recommended</string>
+    <string name="more">More +</string>
+
+    <string name="slow_connection_faster_by_browsing_load_articles">Slow connection?\n Faster by browsing Load articles</string>
+    <string name="no_thanks">No,Thanks</string>
+    <string name="set_as_default">Set as default</string>
+
+    <!--ad-->
+    <string name="facebook_app_id">296990131085917</string>
+    <string name="fb_login_protocol_scheme">fb296990131085917</string>
+    <string name="google_app_id">ca-app-pub-3940256099942544~3347511713</string>
+    <integer name="google_play_services_version">10084000</integer>
+    <!--ad-->
+</resources>

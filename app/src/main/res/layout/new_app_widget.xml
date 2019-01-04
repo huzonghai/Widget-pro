@@ -1,0 +1,155 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:id="@+id/re_search"
+        android:layout_width="match_parent"
+        android:layout_height="33dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_search_bg"
+        >
+
+        <ImageView
+            android:id="@+id/imgv_ser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/search_icon"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="6dp"
+            android:layout_toRightOf="@id/imgv_ser"
+            android:gravity="center_vertical"
+            android:text="Xi Jinping visits the United States"
+            android:textColor="#7dffffff"
+            android:textSize="14sp"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/re_weather"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_weather_bg"
+        >
+
+        <ImageView
+            android:id="@+id/imgv_weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_marginBottom="17dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="17dp"
+            android:src="@mipmap/weather_snow"/>
+
+        <TextView
+            android:id="@+id/tv_weather_centigrade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@id/imgv_weather"
+            android:text="-26°C"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            />
+
+        <TextView
+            android:id="@+id/tv_weather_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_weather_centigrade"
+            android:layout_toRightOf="@id/imgv_weather"
+            android:gravity="center_vertical"
+            android:text="Wednesday"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:id="@+id/tv_weather_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
+            android:text="16:30"
+            android:textColor="#000000"
+            android:textSize="23sp"
+            />
+
+        <TextView
+            android:id="@+id/tv_weather_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tv_weather_time"
+            android:layout_marginRight="15dp"
+            android:gravity="center_vertical"
+            android:text="2018/12/24"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_content_bg"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="孤城三日风吹雨，小市人家只菜蔬"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="孤城三日风吹雨，小市人家只菜蔬"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="翁从旁舍来收网，我适临渊不羡鱼"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="俯仰之间已陈迹，暮窗归了读残书"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            />
+        <ListView
+            android:id="@+id/lv_new"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+
+</LinearLayout>

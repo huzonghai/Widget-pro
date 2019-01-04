@@ -6,5 +6,6 @@ public class MyApp extends App {
     @Override
     public void onCreate() {
         super.onCreate();
+        Utils.mContext = this;
     }
 }

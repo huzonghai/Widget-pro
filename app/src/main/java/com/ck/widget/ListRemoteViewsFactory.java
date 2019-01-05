@@ -13,6 +13,7 @@ import android.widget.RemoteViewsService;
 
 import com.ck.newssdk.beans.ArticleListBean;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,15 +77,28 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     }
 
+    private static int num;
+
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.item_new_app_widget);
-        if (mArticleListBeanList != null) {
 
+        if (mArticleListBeanList != null) {
+            for (int i = 0; i < mArticleListBeanList.size(); i++) {
+                num = i;
+                ExecutorServiceUtils.getInstance(mContext).pushRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        Download.downloadFile(mArticleListBeanList.get(num).getTitlepic(), mContext.getFilesDir().getAbsolutePath(),
+                                String.valueOf(mArticleListBeanList.get(num).getId()));
+                    }
+                });
+            }
             ArticleListBean articleListBean = mArticleListBeanList.get(position);
             rv.setImageViewUri(R.id.imgv_pic, Uri.parse(articleListBean.getTitlepic()));
+            File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+"56213896");
+            rv.setImageViewUri(R.id.imgv_pic, Uri.fromFile(file));
             rv.setTextViewText(R.id.tv_text, articleListBean.getTitle());
-
 
 
             Intent fillInIntent = new Intent();

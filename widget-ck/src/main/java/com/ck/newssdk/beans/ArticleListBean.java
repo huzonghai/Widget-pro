@@ -3,6 +3,8 @@ package com.ck.newssdk.beans;
 
 import com.ck.newssdk.base.entity.MultiItemEntity;
 
+import java.util.Arrays;
+
 public class ArticleListBean implements MultiItemEntity {
 
     /**
@@ -215,5 +217,30 @@ public class ArticleListBean implements MultiItemEntity {
     @Override
     public int getItemType() {
         return itemType;
+    }
+
+    @Override
+    public String toString() {
+        return "ArticleListBean{" +
+                "id=" + id +
+                ", articleid='" + articleid + '\'' +
+                ", countrycode='" + countrycode + '\'' +
+                ", subtime=" + subtime +
+                ", title='" + title + '\'' +
+                ", titlepic='" + titlepic + '\'' +
+                ", topicsid=" + topicsid +
+                ", langid='" + langid + '\'' +
+                ", linkurl='" + linkurl + '\'' +
+                ", channelid=" + channelid +
+                ", imgcount=" + imgcount +
+                ", rank='" + rank + '\'' +
+                ", source='" + source + '\'' +
+                ", sourceurl='" + sourceurl + '\'' +
+                ", status=" + status +
+                ", subuid=" + subuid +
+                ", ctype=" + ctype +
+                ", itemType=" + itemType +
+                ", imgs=" + Arrays.toString(imgs) +
+                '}';
     }
 }

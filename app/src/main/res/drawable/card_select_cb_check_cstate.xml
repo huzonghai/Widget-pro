@@ -1,0 +1,4 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@mipmap/on_icon" android:state_checked="true" /><!--选中时效果-->
+    <item android:drawable="@mipmap/off_icon" android:state_checked="false" /><!--未选中时效果-->
+</selector>

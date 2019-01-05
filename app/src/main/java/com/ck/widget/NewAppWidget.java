@@ -6,73 +6,153 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import com.ck.newssdk.Ck;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class NewAppWidget extends AppWidgetProvider {
     public static final String TAG = "widget";
+    public static final String REFRESH_WIDGET = "refresh_widget";
+    public static final String SEARCH_WIDGET = "serach_widget";
+    public static final String CARD_WIDGET = "card_widget";
+    public static final String CARD_FORM_ACT = "card_for_act";
+    public static final String LOAD_MORE_NEWS_WIDGET = "load_more_news_widget";
+    public static final String COLLECTION_VIEW_ACTION = "collection_view_action";
+    public static final String COLLECTION_VIEW_EXTRA = "collection_view_extra";
+    private static Handler mHandler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            hideLoading(Utils.getApp());
+            Toast.makeText(Utils.getApp(), "刷新成功", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-        //分别绑定id
-        remoteViews.setOnClickPendingIntent(R.id.re_search, getPendingIntent(context, R.id.re_search));
-        remoteViews.setOnClickPendingIntent(R.id.re_weather, getPendingIntent(context, R.id.re_weather));
-        remoteViews.setOnClickPendingIntent(R.id.lv_new, getPendingIntent(context, R.id.lv_new));
+
+        //搜索
+        Intent serach = new Intent().setAction(SEARCH_WIDGET);
+        PendingIntent pendingIntentser = PendingIntent.getBroadcast(context, 0, serach, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.re_search, pendingIntentser);
+
+        //刷新
+        Intent refresh = new Intent().setAction(REFRESH_WIDGET);
+        PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_refresh, pendingIntentre);
+
+        //加载更多资讯
+        Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
+        PendingIntent pendingIntentload = PendingIntent.getBroadcast(context, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
+
+        //卡片管理
+        Intent card = new Intent().setAction(CARD_WIDGET);
+        PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
+
+
+        // 设置 “ListView” 的adapter。
+        // (01) intent: 对应启动 ListWidgetService(RemoteViewsService) 的intent
+        // (02) setRemoteAdapter: 设置 ListView的适配器
+        //    通过setRemoteAdapter将ListView和ListWidgetService关联起来，
+        //    以达到通过 ListWidgetService 更新 ListView 的目的
+        Intent serviceIntent = new Intent(context, ListWidgetService.class);
+        remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
+
+        // 设置响应 “ListView” 的intent模板
+        // 说明：“集合控件(如GridView、ListView、StackView等)”中包含很多子元素。
+        //     它们不能像普通的按钮一样通过 setOnClickPendingIntent 设置点击事件，必须先通过两步。
+        //        (01) 通过 setPendingIntentTemplate 设置 “intent模板”，这是比不可少的！
+        //        (02) 然后在处理该“集合控件”的RemoteViewsFactory类的getViewAt()接口中 通过 setOnClickFillInIntent 设置“集合控件的某一项的数据”
+        Intent listIntent = new Intent();
+        listIntent.setAction(COLLECTION_VIEW_ACTION);
+        listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // 设置intent模板
+        remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
+
         //更新widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
 
-    private static PendingIntent getPendingIntent(Context context, int resID) {
-        Intent intent = new Intent();
-        intent.setClass(context, NewAppWidget.class);//如果没有这一句，表示匿名的。加上表示是显式的。在单个按钮的时候是没啥区别的，但是多个的时候就有问题了
-        intent.setAction("serarch");
-        //设置data域的时候，把控件id一起设置进去，
-        // 因为在绑定的时候，是将同一个id绑定在一起的，所以哪个控件点击，发送的intent中data中的id就是哪个控件的id
-        intent.setData(Uri.parse("id:" + resID));
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        return pendingIntent;
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // 接收到任意广播时触发，在其他方法之前被调用。
-        if (intent.getAction().equals("serarch")) {
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-            Uri data = intent.getData();
-            int resId = -1;
-            if (data != null) {
-                resId = Integer.parseInt(data.getSchemeSpecificPart());
-            }
-            switch (resId) {
-                case R.id.re_search:
-                    String url = "http://s.zlsite.com/?channel=50109";
-                    Intent startAcIntent = new Intent();
-                    startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.MainActivity"));
-                    startAcIntent.putExtra("url", url);
-                    startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(startAcIntent);
+        String action = intent.getAction();
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        //list
+        if (action.equals(COLLECTION_VIEW_ACTION)) {
+            // 接受“ListView”的点击事件的广播
+            int type = intent.getIntExtra("Type", 0);
+            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            int index = intent.getIntExtra(COLLECTION_VIEW_EXTRA, 0);
+            switch (type) {
+                case 0:
+                    Toast.makeText(context, "item" + index, Toast.LENGTH_SHORT).show();
                     break;
-                case R.id.re_weather:
-                    Toast.makeText(context, "天气", Toast.LENGTH_SHORT).show();
+                case 1:
+                    Toast.makeText(context, "lock" + index, Toast.LENGTH_SHORT).show();
                     break;
-                case R.id.lv_new:
-                    Toast.makeText(context, "列表", Toast.LENGTH_SHORT).show();
+                case 2:
+                    Toast.makeText(context, "unlock" + index, Toast.LENGTH_SHORT).show();
                     break;
                 default:
             }
-            //获得appwidget管理实例，用于管理appwidget以便进行更新操作
-            AppWidgetManager manger = AppWidgetManager.getInstance(context);
-            // 相当于获得所有本程序创建的appwidget
-            ComponentName thisName = new ComponentName(context, NewAppWidget.class);
-            //更新
-            manger.updateAppWidget(thisName, remoteViews);
+        } else if (action.equals(SEARCH_WIDGET)) {
+            String url = "http://s.zlsite.com/?channel=50109";
+            Intent startAcIntent = new Intent();
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.MainActivity"));
+            startAcIntent.putExtra("url", url);
+            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startAcIntent);
+        } else if (action.equals(REFRESH_WIDGET)) {
+            Toast.makeText(context, "刷新...", Toast.LENGTH_SHORT).show();
 
+            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+            ComponentName cn = new ComponentName(context, NewAppWidget.class);
+            ListRemoteViewsFactory.refresh();
+            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
+            mHandler.postDelayed(runnable, 2000);
+            showLoading(context);
+        } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
+            Ck.init(context, "us");
+            Intent startAcIntent = new Intent();
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CkActivity"));
+            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startAcIntent);
+        } else if (action.equals(CARD_WIDGET)) {
+            Intent startAcIntent = new Intent();
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CardManageAct"));
+            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startAcIntent);
+        } else if (action.equals(CARD_FORM_ACT)) {
+            if (intent != null) {
+                int type = intent.getIntExtra("type", 2);
+                switch (type) {
+                    case 0:
+                        boolean checkser = intent.getBooleanExtra("check", true);
+                        remoteViews.setViewVisibility(R.id.re_search, checkser == true ? View.VISIBLE : View.GONE);
+                        break;
+                    case 1:
+                        boolean checkwea = intent.getBooleanExtra("check", true);
+                        remoteViews.setViewVisibility(R.id.re_weather, checkwea == true ? View.VISIBLE : View.GONE);
+                        break;
+                    default:
+                }
+            }
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+            appWidgetManager.updateAppWidget(componentName, remoteViews);
         }
+
         Log.i(TAG, "onReceive: 执行");
         super.onReceive(context, intent);
     }
@@ -94,6 +174,41 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         Log.i(TAG, "onDisabled: 执行");
+    }
+
+
+    /**
+     * 显示加载loading
+     */
+    private void showLoading(Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews.setViewVisibility(R.id.tv_refresh, View.VISIBLE);
+        remoteViews.setViewVisibility(R.id.progress_bar, View.VISIBLE);
+        remoteViews.setTextViewText(R.id.tv_refresh, "正在刷新...");
+        refreshWidget(context, remoteViews, false);
+    }
+
+    /**
+     * 隐藏加载loading
+     */
+    private void hideLoading(Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+//        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
+        remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
+        remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
+        refreshWidget(context, remoteViews, false);
+    }
+
+    /**
+     * 刷新Widget
+     */
+    private void refreshWidget(Context context, RemoteViews remoteViews, boolean refreshList) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+        appWidgetManager.updateAppWidget(componentName, remoteViews);
+        if (refreshList) {
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
+        }
     }
 }
 

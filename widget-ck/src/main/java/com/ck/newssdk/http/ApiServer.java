@@ -84,6 +84,7 @@ public class ApiServer {
                 .setParams(Configuration.recommend, map, new RequestCallback() {
                     @Override
                     public void onSuccess(String data) {
+                        System.out.println("ApiServer.onSuccess--->  " + data);
                         try {
                             JSONObject obj = new JSONObject(data);
                             JSONArray jsonArray = (JSONArray) obj.get("articles");

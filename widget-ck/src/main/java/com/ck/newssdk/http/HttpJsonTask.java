@@ -26,9 +26,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HttpJsonTask implements Runnable {
 
-//    private Handler handler;
+    //    private Handler handler;
     private Activity context;
-//    RequestType requestType;
+    //    RequestType requestType;
     private String method;
     private String url;
     private Map params;
@@ -108,13 +108,13 @@ public class HttpJsonTask implements Runnable {
 //                //doRequestFile();
 //                break;
 //            case Json:
-                doRequest();
+        doRequest();
 //                break;
 //        }
     }
 
 
-    HttpJsonTask(Activity context) {
+    public HttpJsonTask(Activity context) {
         this.context = context;
 //        requestType = type;
     }
@@ -134,6 +134,7 @@ public class HttpJsonTask implements Runnable {
         HttpsURLConnection connection;
         try {
             URL urlObj = new URL(url);
+            System.out.println("HttpJsonTask.doRequest--->   " + url);
             connection = (HttpsURLConnection) urlObj.openConnection();
             connection.setSSLSocketFactory(HttpsFactroy.getSSLSocketFactory(context));
 
@@ -177,11 +178,11 @@ public class HttpJsonTask implements Runnable {
 //                    context.runOnUiThread(new Runnable() {
 //                        @Override
 //                        public void run() {
-                            if (context != null)
-                                if (finalStatus == BaseResponseParser.RESPONSE_OK_STATUS)
-                                    callback.onSuccess(finalJson);
-                                else
-                                    callback.onFailure(finalErrorMsg);
+                if (context != null)
+                    if (finalStatus == BaseResponseParser.RESPONSE_OK_STATUS)
+                        callback.onSuccess(finalJson);
+                    else
+                        callback.onFailure(finalErrorMsg);
 //                        }
 //                    });
             } else {

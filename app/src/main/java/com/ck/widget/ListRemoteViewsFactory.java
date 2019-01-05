@@ -1,23 +1,52 @@
 package com.ck.widget;
 
+import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import com.ck.newssdk.beans.ArticleListBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-    private final static String TAG = "widget";
+    private static String TAG = "RemoteViewsFactory_widget";
     private Context mContext;
-    private int mAppWidgetId;
+    private static int mAppWidgetId;
     private static int i;
-
+    private final static int SUCCESS = 0;
+    private final static int FAIL = 1;
     private static List<Device> mDevices;
+    private Message message;
+    private static List<ArticleListBean> mArticleListBeanList;
+
+    @SuppressLint("HandlerLeak")
+    private static Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case SUCCESS:
+                    break;
+                case FAIL:
+                    break;
+                default:
+            }
+        }
+    };
+
+    public static void setArticleData(List<ArticleListBean> articleData) {
+        mArticleListBeanList = articleData;
+        System.out.println("ListRemoteViewsFactory.setArticleData   " + mArticleListBeanList.size() + "      " + mArticleListBeanList.toString());
+    }
 
     /**
      * 构造ListRemoteViewsFactory
@@ -31,45 +60,55 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public void onCreate() {
         Log.e(TAG, "onCreate");
-        // 初始化“集合视图”中的数据
+
         initListViewData();
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initListViewData() {
+        mDevices = new ArrayList<>();
+        mDevices.add(new Device("-26°C", 0));
+        mDevices.add(new Device("-18°C", 1));
+        mDevices.add(new Device("20°C", 2));
+
+
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
-        //  HashMap<String, Object> map;
-
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.item_new_app_widget);
+        if (mArticleListBeanList != null) {
 
-        // 设置 第position位的“视图”的数据
-        Device device = mDevices.get(position);
-        //  rv.setImageViewResource(R.id.iv_lock, ((Integer) map.get(IMAGE_ITEM)).intValue());
-        rv.setTextViewText(R.id.tv_weather_centigrade, device.getName());
-
-        // 设置 第position位的“视图”对应的响应事件
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtra("Type", 0);
-        fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-        rv.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
+            ArticleListBean articleListBean = mArticleListBeanList.get(position);
+            rv.setImageViewUri(R.id.imgv_pic, Uri.parse(articleListBean.getTitlepic()));
+            rv.setTextViewText(R.id.tv_text, articleListBean.getTitle());
 
 
-        Intent lockIntent = new Intent();
-        lockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-        lockIntent.putExtra("Type", 1);
-        rv.setOnClickFillInIntent(R.id.tv_weather_centigrade, lockIntent);
 
-        Intent unlockIntent = new Intent();
-        unlockIntent.putExtra("Type", 2);
-        unlockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-        rv.setOnClickFillInIntent(R.id.tv_weather_week, unlockIntent);
+            Intent fillInIntent = new Intent();
+            fillInIntent.putExtra("Type", 0);
+            fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
+            rv.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
 
+
+            Intent lockIntent = new Intent();
+            lockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
+            lockIntent.putExtra("Type", 1);
+            rv.setOnClickFillInIntent(R.id.imgv_pic, lockIntent);
+
+            Intent unlockIntent = new Intent();
+            unlockIntent.putExtra("Type", 2);
+            unlockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
+            rv.setOnClickFillInIntent(R.id.tv_text, unlockIntent);
+        }
         return rv;
     }
 
-    /**
-     * 初始化ListView的数据
-     */
-    private void initListViewData() {
+
+    public static void refresh() {
+        i++;
         mDevices = new ArrayList<>();
         mDevices.add(new Device("-26°C", 0));
         mDevices.add(new Device("-18°C", 1));
@@ -77,16 +116,10 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
 
-    public static void refresh() {
-        i++;
-        mDevices.add(new Device("Refresh" + i, 1));
-    }
-
-
     @Override
     public int getCount() {
         // 返回“集合视图”中的数据的总数
-        return mDevices.size();
+        return mArticleListBeanList.size();
     }
 
     @Override
@@ -117,6 +150,8 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDestroy() {
-        mDevices.clear();
+        mArticleListBeanList.clear();
     }
+
+
 }

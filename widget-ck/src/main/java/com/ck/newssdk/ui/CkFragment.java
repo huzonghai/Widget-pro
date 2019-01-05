@@ -46,6 +46,7 @@ public class CkFragment extends LazyBaseFragment implements ArticleView.View, Ba
 
     private boolean isPrepared;
     private boolean isLoadedOnce;
+    private static CkFragment f;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -181,7 +182,7 @@ public class CkFragment extends LazyBaseFragment implements ArticleView.View, Ba
     }
 
     public static CkFragment newInstance(int topicId) {
-        CkFragment f = new CkFragment();
+        f = new CkFragment();
         Bundle b = new Bundle();
         b.putInt("topicId", topicId);
         f.setArguments(b);

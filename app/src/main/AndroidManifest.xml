@@ -40,7 +40,6 @@
             />
 
         <receiver android:name=".NewAppWidget">
-
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="collection_view_action"/>
@@ -48,7 +47,6 @@
                 <action android:name="serach_widget"/>
                 <action android:name="load_more_news_widget"/>
                 <action android:name="card_widget"/>
-
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

@@ -134,19 +134,15 @@ public class NewAppWidget extends AppWidgetProvider {
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
-            Toast.makeText(context, "TOP...", Toast.LENGTH_SHORT).show();
             if (intent != null) {
                 int type = intent.getIntExtra("type", 2);
-                System.out.println("NewAppWidget.onReceive  " + type);
                 switch (type) {
                     case 0:
                         boolean checkser = intent.getBooleanExtra("check", true);
-                        System.out.println("NewAppWidget.onReceive  " + checkser);
                         remoteViews.setViewVisibility(R.id.re_search, checkser == true ? View.VISIBLE : View.GONE);
                         break;
                     case 1:
                         boolean checkwea = intent.getBooleanExtra("check", true);
-                        System.out.println("NewAppWidget.onReceive  " + checkwea);
                         remoteViews.setViewVisibility(R.id.re_weather, checkwea == true ? View.VISIBLE : View.GONE);
                         break;
                     default:

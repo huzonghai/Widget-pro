@@ -13,7 +13,6 @@ import com.ck.newssdk.utils.Iml;
 public class Ck {
     public static void init(Context context,String countryCode) {
         Iml.initIml(context,countryCode);
-        System.out.println("Ck.init");
     }
     public static void open(Context context) {
         context.startActivity(new Intent(context, CkActivity.class));

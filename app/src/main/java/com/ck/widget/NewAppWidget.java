@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.ck.newssdk.Ck;
+
 /**
  * Implementation of App Widget functionality.
  */
@@ -20,6 +22,8 @@ public class NewAppWidget extends AppWidgetProvider {
     public static final String REFRESH_WIDGET = "refresh_widget";
     public static final String SEARCH_WIDGET = "serach_widget";
     public static final String CARD_WIDGET = "card_widget";
+    public static final String CARD_FORM_ACT = "card_for_act";
+    public static final String LOAD_MORE_NEWS_WIDGET = "load_more_news_widget";
     public static final String COLLECTION_VIEW_ACTION = "collection_view_action";
     public static final String COLLECTION_VIEW_EXTRA = "collection_view_extra";
     private static Handler mHandler = new Handler();
@@ -44,10 +48,15 @@ public class NewAppWidget extends AppWidgetProvider {
         PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_refresh, pendingIntentre);
 
+        //加载更多资讯
+        Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
+        PendingIntent pendingIntentload = PendingIntent.getBroadcast(context, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
+
         //卡片管理
         Intent card = new Intent().setAction(CARD_WIDGET);
         PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentcard);
+        remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
 
 
         // 设置 “ListView” 的adapter。
@@ -78,6 +87,7 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
         //list
         if (action.equals(COLLECTION_VIEW_ACTION)) {
             // 接受“ListView”的点击事件的广播
@@ -112,13 +122,39 @@ public class NewAppWidget extends AppWidgetProvider {
             mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
             mHandler.postDelayed(runnable, 2000);
             showLoading(context);
-        } else if (action.equals(CARD_WIDGET)) {
-            String url = "http://s.zlsite.com/?channel=50109";
+        } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
+            Ck.init(context, "us");
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.MainActivity"));
-            startAcIntent.putExtra("url", url);
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
+        } else if (action.equals(CARD_WIDGET)) {
+            Intent startAcIntent = new Intent();
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CardManageAct"));
+            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startAcIntent);
+        } else if (action.equals(CARD_FORM_ACT)) {
+            Toast.makeText(context, "TOP...", Toast.LENGTH_SHORT).show();
+            if (intent != null) {
+                int type = intent.getIntExtra("type", 2);
+                System.out.println("NewAppWidget.onReceive  " + type);
+                switch (type) {
+                    case 0:
+                        boolean checkser = intent.getBooleanExtra("check", true);
+                        System.out.println("NewAppWidget.onReceive  " + checkser);
+                        remoteViews.setViewVisibility(R.id.re_search, checkser == true ? View.VISIBLE : View.GONE);
+                        break;
+                    case 1:
+                        boolean checkwea = intent.getBooleanExtra("check", true);
+                        System.out.println("NewAppWidget.onReceive  " + checkwea);
+                        remoteViews.setViewVisibility(R.id.re_weather, checkwea == true ? View.VISIBLE : View.GONE);
+                        break;
+                    default:
+                }
+            }
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+            appWidgetManager.updateAppWidget(componentName, remoteViews);
         }
 
         Log.i(TAG, "onReceive: 执行");
@@ -161,6 +197,7 @@ public class NewAppWidget extends AppWidgetProvider {
      */
     private void hideLoading(Context context) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+//        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
         remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
         remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
         refreshWidget(context, remoteViews, false);

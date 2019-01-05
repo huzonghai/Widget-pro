@@ -30,12 +30,23 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CkActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".CardManageAct"
+            android:screenOrientation="portrait"
+            />
+
         <receiver android:name=".NewAppWidget">
+
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="collection_view_action"/>
                 <action android:name="refresh_widget"/>
                 <action android:name="serach_widget"/>
+                <action android:name="load_more_news_widget"/>
                 <action android:name="card_widget"/>
 
             </intent-filter>

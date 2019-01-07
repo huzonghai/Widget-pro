@@ -12,15 +12,11 @@ android {
     }
     buildTypes {
         debug {
-            //启用代码混淆
             minifyEnabled false
-            //混淆规则配置文件
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            //启用代码混淆
             minifyEnabled true
-            //混淆规则配置文件
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

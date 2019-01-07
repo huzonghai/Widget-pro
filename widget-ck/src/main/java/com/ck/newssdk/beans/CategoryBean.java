@@ -23,4 +23,12 @@ public class CategoryBean {
     public void setTopicname(String topicname) {
         this.topicname = topicname;
     }
+
+    @Override
+    public String toString() {
+        return "CategoryBean{" +
+                "topicid=" + topicid +
+                ", topicname='" + topicname + '\'' +
+                '}';
+    }
 }

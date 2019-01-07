@@ -26,6 +26,8 @@
         android:layout_marginRight="15dp"
         android:gravity="center_vertical"
         android:text="2018/12/24"
+        android:maxLines="3"
+        android:ellipsize="end"
         android:textColor="#ff424242"
         android:textSize="13sp"
         />

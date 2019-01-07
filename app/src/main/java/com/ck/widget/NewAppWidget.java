@@ -1,5 +1,6 @@
 package com.ck.widget;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -7,18 +8,40 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.ck.newssdk.Ck;
+import com.ck.newssdk.beans.ArticleListBean;
+import com.ck.newssdk.config.Configuration;
+import com.ck.newssdk.http.RequestCallback;
+import com.ck.newssdk.utils.DeviceUtils;
+import com.ck.newssdk.utils.JsonUtil;
+import com.ck.newssdk.utils.ThreadPoolExecutorUtils;
+import com.ck.widget.api.HttpJsonTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.ck.newssdk.ui.article.MultipleItemAdapter.BIG_IMG;
+import static com.ck.newssdk.ui.article.MultipleItemAdapter.IMG;
+import static com.ck.newssdk.ui.article.MultipleItemAdapter.TEXT;
+import static com.ck.newssdk.ui.article.MultipleItemAdapter.THREE_IMG;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class NewAppWidget extends AppWidgetProvider {
-    public static final String TAG = "widget";
+    public static final String TAG = "WIDGET";
     public static final String REFRESH_WIDGET = "refresh_widget";
     public static final String SEARCH_WIDGET = "serach_widget";
     public static final String CARD_WIDGET = "card_widget";
@@ -26,7 +49,38 @@ public class NewAppWidget extends AppWidgetProvider {
     public static final String LOAD_MORE_NEWS_WIDGET = "load_more_news_widget";
     public static final String COLLECTION_VIEW_ACTION = "collection_view_action";
     public static final String COLLECTION_VIEW_EXTRA = "collection_view_extra";
-    private static Handler mHandler = new Handler();
+
+    private static Context mContext;
+    private final static int GETRECOMMEND_SUCCESS = 3;
+
+    @SuppressLint("HandlerLeak")
+    private static Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case GETRECOMMEND_SUCCESS:
+                    ListRemoteViewsFactory.setArticleData((List<ArticleListBean>) msg.obj);
+
+                    RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
+                    Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
+                    remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
+                    Intent listIntent = new Intent();
+                    listIntent.setAction(COLLECTION_VIEW_ACTION);
+//                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
+
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
+                    ComponentName componentName = new ComponentName(mContext, NewAppWidget.class);
+                    appWidgetManager.updateAppWidget(componentName, remoteViews);
+
+//                    appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+                    break;
+                default:
+            }
+        }
+    };
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -59,26 +113,6 @@ public class NewAppWidget extends AppWidgetProvider {
         remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
 
 
-        // 设置 “ListView” 的adapter。
-        // (01) intent: 对应启动 ListWidgetService(RemoteViewsService) 的intent
-        // (02) setRemoteAdapter: 设置 ListView的适配器
-        //    通过setRemoteAdapter将ListView和ListWidgetService关联起来，
-        //    以达到通过 ListWidgetService 更新 ListView 的目的
-        Intent serviceIntent = new Intent(context, ListWidgetService.class);
-        remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
-
-        // 设置响应 “ListView” 的intent模板
-        // 说明：“集合控件(如GridView、ListView、StackView等)”中包含很多子元素。
-        //     它们不能像普通的按钮一样通过 setOnClickPendingIntent 设置点击事件，必须先通过两步。
-        //        (01) 通过 setPendingIntentTemplate 设置 “intent模板”，这是比不可少的！
-        //        (02) 然后在处理该“集合控件”的RemoteViewsFactory类的getViewAt()接口中 通过 setOnClickFillInIntent 设置“集合控件的某一项的数据”
-        Intent listIntent = new Intent();
-        listIntent.setAction(COLLECTION_VIEW_ACTION);
-        listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // 设置intent模板
-        remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
-
         //更新widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
@@ -86,26 +120,15 @@ public class NewAppWidget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        mContext = context;
         String action = intent.getAction();
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
         //list
         if (action.equals(COLLECTION_VIEW_ACTION)) {
-            // 接受“ListView”的点击事件的广播
-            int type = intent.getIntExtra("Type", 0);
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int index = intent.getIntExtra(COLLECTION_VIEW_EXTRA, 0);
-            switch (type) {
-                case 0:
-                    Toast.makeText(context, "item" + index, Toast.LENGTH_SHORT).show();
-                    break;
-                case 1:
-                    Toast.makeText(context, "lock" + index, Toast.LENGTH_SHORT).show();
-                    break;
-                case 2:
-                    Toast.makeText(context, "unlock" + index, Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-            }
+
+            Toast.makeText(context, "item" + index, Toast.LENGTH_SHORT).show();
         } else if (action.equals(SEARCH_WIDGET)) {
             String url = "http://s.zlsite.com/?channel=50109";
             Intent startAcIntent = new Intent();
@@ -114,11 +137,10 @@ public class NewAppWidget extends AppWidgetProvider {
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
-            Toast.makeText(context, "刷新...", Toast.LENGTH_SHORT).show();
-
             AppWidgetManager mgr = AppWidgetManager.getInstance(context);
             ComponentName cn = new ComponentName(context, NewAppWidget.class);
-            ListRemoteViewsFactory.refresh();
+//            ListRemoteViewsFactory.refresh(context);
+            initListViewData();
             mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
             mHandler.postDelayed(runnable, 2000);
             showLoading(context);
@@ -159,6 +181,7 @@ public class NewAppWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        mContext = context;
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             Log.i(TAG, "onUpdate: 执行");
@@ -167,6 +190,8 @@ public class NewAppWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
+        mContext = context;
+        initListViewData();
         Log.i(TAG, "onEnabled: 执行");
 
     }
@@ -176,6 +201,73 @@ public class NewAppWidget extends AppWidgetProvider {
         Log.i(TAG, "onDisabled: 执行");
     }
 
+    /**
+     * 初始化数据
+     */
+    private static void initListViewData() {
+        String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
+        Ck.init(mContext, countryCode);
+        getRecommend(mContext, Configuration.CurrentCountry);
+    }
+
+
+    /**
+     * 获取当前国家推荐
+     *
+     * @param countryCode
+     */
+    public static void getRecommend(Context context, String countryCode) {
+        Map map = new HashMap();
+        map.put("uuid", DeviceUtils.getUUID(context));
+        map.put("countrycode", countryCode);
+        map.put("time", System.currentTimeMillis());
+        HttpJsonTask task = new HttpJsonTask(context)
+                .setParams(Configuration.recommend, map, new RequestCallback() {
+                    @Override
+                    public void onSuccess(String data) {
+                        try {
+                            JSONObject obj = new JSONObject(data);
+                            JSONArray jsonArray = (JSONArray) obj.get("articles");
+                            ArrayList<ArticleListBean> list = JsonUtil.parseArray(jsonArray.toString(), ArticleListBean.class);
+                            List<ArticleListBean> articleListBeans = handleData(list);
+                            Message message = mHandler.obtainMessage();
+                            message.what = GETRECOMMEND_SUCCESS;
+                            message.obj = articleListBeans;
+                            mHandler.sendMessage(message);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                    }
+                });
+        ThreadPoolExecutorUtils.getInstance().execute(task);
+    }
+
+    private static List<ArticleListBean> handleData(List<ArticleListBean> list) {
+        List<ArticleListBean> data = new ArrayList<>();
+        for (ArticleListBean b : list) {
+            String[] imgs = b.getTitlepic().split("\\|");
+            if (imgs.length > 0) {
+                if (imgs.length >= 3) {
+                    b.setItemType(THREE_IMG);
+                } else {
+                    if (b.getCtype() == 1) {
+                        b.setItemType(BIG_IMG);
+                    } else {
+                        b.setItemType(IMG);
+                    }
+                }
+                b.setImgs(imgs);
+            } else {
+                b.setItemType(TEXT);
+            }
+            data.add(b);
+        }
+        return data;
+    }
 
     /**
      * 显示加载loading
@@ -210,5 +302,7 @@ public class NewAppWidget extends AppWidgetProvider {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
         }
     }
+
+
 }
 

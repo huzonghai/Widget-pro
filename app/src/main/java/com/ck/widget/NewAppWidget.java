@@ -37,9 +37,7 @@ import static com.ck.newssdk.ui.article.MultipleItemAdapter.IMG;
 import static com.ck.newssdk.ui.article.MultipleItemAdapter.TEXT;
 import static com.ck.newssdk.ui.article.MultipleItemAdapter.THREE_IMG;
 
-/**
- * Implementation of App Widget functionality.
- */
+
 public class NewAppWidget extends AppWidgetProvider {
     public static final String TAG = "WIDGET";
     public static final String REFRESH_WIDGET = "refresh_widget";
@@ -52,6 +50,7 @@ public class NewAppWidget extends AppWidgetProvider {
 
     private static Context mContext;
     private final static int GETRECOMMEND_SUCCESS = 3;
+    private static boolean isRefresh = false;
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -62,20 +61,28 @@ public class NewAppWidget extends AppWidgetProvider {
                 case GETRECOMMEND_SUCCESS:
                     ListRemoteViewsFactory.setArticleData((List<ArticleListBean>) msg.obj);
 
-                    RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
-                    Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
-                    remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
-                    Intent listIntent = new Intent();
-                    listIntent.setAction(COLLECTION_VIEW_ACTION);
-//                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
-
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                     ComponentName componentName = new ComponentName(mContext, NewAppWidget.class);
-                    appWidgetManager.updateAppWidget(componentName, remoteViews);
 
-//                    appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+                    RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
+
+                    int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+                    if (isRefresh) {
+                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
+                        isRefresh = false;
+                    } else {
+                        Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
+                        remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
+                        Intent listIntent = new Intent();
+                        listIntent.setAction(COLLECTION_VIEW_ACTION);
+//                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
+                    }
+
+//                    appWidgetManager.updateAppWidget(componentName, remoteViews);
+
+                    appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
                     break;
                 default:
             }
@@ -137,11 +144,12 @@ public class NewAppWidget extends AppWidgetProvider {
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
-            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-            ComponentName cn = new ComponentName(context, NewAppWidget.class);
+//            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+//            ComponentName cn = new ComponentName(context, NewAppWidget.class);
 //            ListRemoteViewsFactory.refresh(context);
             initListViewData();
-            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
+            isRefresh = true;
+//            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
             mHandler.postDelayed(runnable, 2000);
             showLoading(context);
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {

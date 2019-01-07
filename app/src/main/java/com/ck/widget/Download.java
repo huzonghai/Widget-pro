@@ -77,7 +77,6 @@ public class Download {
                 int fileLength = conn.getContentLength();
                 CKLogger.d("file length---->" + fileLength);
                 file = new File(downloadDir, picname);
-                //检验大小是否一致
                 if (file.exists()) {
                     if (file.length() == fileLength) {
                         CKLogger.d("ready exist file : " + file.getName());
@@ -87,7 +86,6 @@ public class Download {
                         CKLogger.d(String.format("ready exist file error delete %s", delete));
                     }
                 }
-
                 if (!file.getParentFile().exists()) {
                     file.getParentFile().mkdirs();
                 }
@@ -102,7 +100,6 @@ public class Download {
                 }
                 bin.close();
                 out.close();
-
                 if (file.length() == fileLength) {
                     CKLogger.d("finish download file : " + file.getName());
                     return file;

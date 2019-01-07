@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mWebView = findViewById(R.id.webview);
         mB_loc.setOnClickListener(this);
         mB_test.setOnClickListener(this);
-        initWidgetUIData();
+//        initWidgetUIData();
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onGetArticle(List<ArticleListBean> articleListBean) {
-        ListRemoteViewsFactory.setArticleData(articleListBean);
+//        ListRemoteViewsFactory.setArticleData(articleListBean, this);
 //        System.out.println("MainActivity.onGetArticle   " + articleListBean.size() + "      " + articleListBean.toString());
     }
 

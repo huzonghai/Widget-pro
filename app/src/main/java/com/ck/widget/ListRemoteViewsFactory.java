@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -13,22 +13,21 @@ import android.widget.RemoteViewsService;
 
 import com.ck.newssdk.beans.ArticleListBean;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static String TAG = "RemoteViewsFactory_widget";
-    private Context mContext;
+    private static Context mContext;
     private static int mAppWidgetId;
     private static int i;
+
+    private static Bitmap bitmap;
+    private static List<ArticleListBean> mArticleListBeanList;
+    private static int num;
     private final static int SUCCESS = 0;
     private final static int FAIL = 1;
-    private static List<Device> mDevices;
-    private Message message;
-    private static List<ArticleListBean> mArticleListBeanList;
-
+    private static RemoteViews remoteViews;
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
         @Override
@@ -36,6 +35,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             super.handleMessage(msg);
             switch (msg.what) {
                 case SUCCESS:
+                    remoteViews.setImageViewBitmap(R.id.imgv_pic, bitmap);
                     break;
                 case FAIL:
                     break;
@@ -43,11 +43,6 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             }
         }
     };
-
-    public static void setArticleData(List<ArticleListBean> articleData) {
-        mArticleListBeanList = articleData;
-        System.out.println("ListRemoteViewsFactory.setArticleData   " + mArticleListBeanList.size() + "      " + mArticleListBeanList.toString());
-    }
 
     /**
      * 构造ListRemoteViewsFactory
@@ -58,81 +53,84 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     }
 
+    public static void setArticleData(List<ArticleListBean> articleListBean) {
+        mArticleListBeanList = articleListBean;
+
+    }
+
     @Override
     public void onCreate() {
-        Log.e(TAG, "onCreate");
-
+        Log.i(TAG, "onCreate");
         initListViewData();
     }
 
     /**
      * 初始化数据
      */
-    private void initListViewData() {
-        mDevices = new ArrayList<>();
-        mDevices.add(new Device("-26°C", 0));
-        mDevices.add(new Device("-18°C", 1));
-        mDevices.add(new Device("20°C", 2));
-
-
+    private static void initListViewData() {
     }
 
-    private static int num;
 
     @Override
     public RemoteViews getViewAt(int position) {
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.item_new_app_widget);
 
-        if (mArticleListBeanList != null) {
-            for (int i = 0; i < mArticleListBeanList.size(); i++) {
-                num = i;
-                ExecutorServiceUtils.getInstance(mContext).pushRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        Download.downloadFile(mArticleListBeanList.get(num).getTitlepic(), mContext.getFilesDir().getAbsolutePath(),
-                                String.valueOf(mArticleListBeanList.get(num).getId()));
-                    }
-                });
-            }
-            ArticleListBean articleListBean = mArticleListBeanList.get(position);
-            rv.setImageViewUri(R.id.imgv_pic, Uri.parse(articleListBean.getTitlepic()));
-            File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+"56213896");
-            rv.setImageViewUri(R.id.imgv_pic, Uri.fromFile(file));
-            rv.setTextViewText(R.id.tv_text, articleListBean.getTitle());
+        remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item_new_app_widget);
+
+        ArticleListBean articleListBean = mArticleListBeanList.get(position);
+
+//        File file = new File(mContext.getFilesDir().getAbsolutePath() + "/" + "56218349.png");
+        // android.os.FileUriExposedException: file:///data/data/com.ck.widget/files/56218356.png exposed beyond app through RemoteViews.setUri()
+//        rv.setImageViewUri(R.id.imgv_pic, Uri.fromFile(file));
+//        rv.setImageViewUri(R.id.imgv_pic, Uri.parse(file.getAbsolutePath()));
+
+//        Download.downloadFile(mArticleListBeanList.get(num).getTitlepic(), mContext.getFilesDir().getAbsolutePath(),String.valueOf(mArticleListBeanList.get(num).getId()) + ".png");
+
+//        if (mArticleListBeanList != null) {
+//            for (int i = 0; i < mArticleListBeanList.size(); i++) {
+//                num = i;
+//                if (mArticleListBeanList.get(num).getItemType() == 3) {
+//                    System.out.println("ListTitlepic---> " + mArticleListBeanList.get(num).getTitlepic());
+//                    ExecutorServiceUtils.getInstance(mContext).pushRunnable(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            bitmap = Download.downloadToBitmap(mArticleListBeanList.get(num).getTitlepic());
+//                            Message message = mHandler.obtainMessage();
+//                            message.what = SUCCESS;
+//                            mHandler.sendMessageAtTime(message, 1000);
+//                        }
+//                    });
+//                }
+//            }
+//        }
+
+        bitmap = Download.downloadToBitmap("http://cdn.img.coolook.org/2019-01-07/bcba7dedbb909fd8664a4cdedbb2fd3c.jpg!240");
+        Message message = mHandler.obtainMessage();
+        message.what = SUCCESS;
+        mHandler.sendMessageAtTime(message, 500);
+
+        remoteViews.setTextViewText(R.id.tv_text, articleListBean.getTitle());
 
 
-            Intent fillInIntent = new Intent();
-            fillInIntent.putExtra("Type", 0);
-            fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-            rv.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtra("Type", 0);
+        fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
+        remoteViews.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
 
-
-            Intent lockIntent = new Intent();
-            lockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-            lockIntent.putExtra("Type", 1);
-            rv.setOnClickFillInIntent(R.id.imgv_pic, lockIntent);
-
-            Intent unlockIntent = new Intent();
-            unlockIntent.putExtra("Type", 2);
-            unlockIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
-            rv.setOnClickFillInIntent(R.id.tv_text, unlockIntent);
-        }
-        return rv;
+        return remoteViews;
     }
 
 
-    public static void refresh() {
-        i++;
-        mDevices = new ArrayList<>();
-        mDevices.add(new Device("-26°C", 0));
-        mDevices.add(new Device("-18°C", 1));
-        mDevices.add(new Device("20°C", 2));
+    public static void refresh(Context context) {
+        mContext = context;
+        if (mArticleListBeanList != null) {
+            mArticleListBeanList.clear();
+        }
+        initListViewData();
     }
 
 
     @Override
     public int getCount() {
-        // 返回“集合视图”中的数据的总数
         return mArticleListBeanList.size();
     }
 

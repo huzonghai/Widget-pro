@@ -7,8 +7,10 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -19,6 +21,7 @@ import com.ck.newssdk.R;
 import com.ck.newssdk.beans.ArticleListBean;
 import com.ck.newssdk.config.Configuration;
 import com.ck.newssdk.http.RequestCallback;
+import com.ck.newssdk.ui.web.WebActivity;
 import com.ck.newssdk.utils.DeviceUtils;
 import com.ck.newssdk.utils.Iml;
 import com.ck.newssdk.utils.JsonUtil;
@@ -47,12 +50,19 @@ public class NewAppWidget extends AppWidgetProvider {
     public static final String CARD_FORM_ACT = "card_for_act";
     public static final String LOAD_MORE_NEWS_WIDGET = "load_more_news_widget";
     public static final String COLLECTION_VIEW_ACTION = "collection_view_action";
+
     public static final String COLLECTION_VIEW_EXTRA = "collection_view_extra";
+    public static final String COLLECTION_VIEW_BEAN_EXTRA = "collection_view_bean_extra";
 
     private static Context mContext;
     private final static int GETRECOMMEND_SUCCESS = 3;
     private final static int GETRECOMMEND_FAIL = 4;
+    private final static int WEATHER_SUCCESS = 5;
+    private final static int WEATHER_FAIL = 6;
     private static boolean isRefresh = false;
+    private static RemoteViews remoteViews;
+    private static AppWidgetManager appWidgetManager;
+    private static ComponentName componentName;
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -60,13 +70,14 @@ public class NewAppWidget extends AppWidgetProvider {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+
                 case GETRECOMMEND_SUCCESS:
                     //设置数据
                     ListRemoteViewsFactory.setArticleData((List<ArticleListBean>) msg.obj);
 
-                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
-                    ComponentName componentName = new ComponentName(mContext, NewAppWidget.class);
-                    RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
+                    appWidgetManager = AppWidgetManager.getInstance(mContext);
+                    componentName = new ComponentName(mContext, NewAppWidget.class);
+                    remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
 
                     if (isRefresh) {
@@ -79,6 +90,7 @@ public class NewAppWidget extends AppWidgetProvider {
                         Intent listIntent = new Intent();
                         listIntent.setAction(COLLECTION_VIEW_ACTION);
 //                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                        listIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
                     }
@@ -89,28 +101,46 @@ public class NewAppWidget extends AppWidgetProvider {
                     hideLoading(mContext);
                     Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT).show();
                     break;
+                case WEATHER_SUCCESS:
+                    appWidgetManager = AppWidgetManager.getInstance(mContext);
+                    componentName = new ComponentName(mContext, NewAppWidget.class);
+                    remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
+                    Weather weather = (Weather) msg.obj;
+                    remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
+                    remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
+                    remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
+                    CKLogger.d(weather.temp + weather.cityname);
+                    appWidgetManager.updateAppWidget(componentName, remoteViews);
+                    break;
+                case WEATHER_FAIL://展示默认图标
+
+                    break;
                 default:
             }
         }
     };
 
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
 
         //搜索
         Intent serach = new Intent().setAction(SEARCH_WIDGET);
+        serach.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentser = PendingIntent.getBroadcast(context, 0, serach, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.re_search, pendingIntentser);
         //刷新
         Intent refresh = new Intent().setAction(REFRESH_WIDGET);
+        refresh.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_refresh, pendingIntentre);
         //加载更多资讯
         Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
+        loadnews.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentload = PendingIntent.getBroadcast(context, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
         //卡片管理
         Intent card = new Intent().setAction(CARD_WIDGET);
+        card.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
 
@@ -118,22 +148,35 @@ public class NewAppWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
 
+    private void jumpToWeb(ArticleListBean news) {
+        Iml.initIml(mContext);
+        Intent intent = new Intent(mContext, WebActivity.class);
+        intent.putExtra("linkurl", news.getLinkurl());
+        intent.putExtra("sourceurl", news.getSourceurl());
+        intent.putExtra("title", news.getTitle());
+        intent.putExtra("articleid", news.getId());
+        mContext.startActivity(intent);
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
         String action = intent.getAction();
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
         //list
         if (action.equals(COLLECTION_VIEW_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int index = intent.getIntExtra(COLLECTION_VIEW_EXTRA, 0);
-
+            ArticleListBean articleListBean = (ArticleListBean) intent.getSerializableExtra(COLLECTION_VIEW_BEAN_EXTRA);
+            jumpToWeb(articleListBean);
             Toast.makeText(context, "item" + index, Toast.LENGTH_SHORT).show();
         } else if (action.equals(SEARCH_WIDGET)) {
             String url = "http://s.zlsite.com/?channel=50109";
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.MainActivity"));
+            //launcher:packageName="com.ssui.launcher3"
+//            launcher:className="com.ck.newssdk.widget.NewAppWidget"
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -144,12 +187,15 @@ public class NewAppWidget extends AppWidgetProvider {
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
             Ck.init(context, "us");
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CkActivity"));
+
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -167,8 +213,8 @@ public class NewAppWidget extends AppWidgetProvider {
                     default:
                 }
             }
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+            appWidgetManager = AppWidgetManager.getInstance(context);
+            componentName = new ComponentName(context, NewAppWidget.class);
             appWidgetManager.updateAppWidget(componentName, remoteViews);
         }
 
@@ -179,6 +225,12 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         mContext = context;
+        //初始化列表数据
+        initListViewData();
+        //天气
+        initWeatherData();
+        Log.i(TAG, "onEnabled: 执行");
+
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             Log.i(TAG, "onUpdate: 执行");
@@ -188,9 +240,55 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         mContext = context;
-        initListViewData();
-        Log.i(TAG, "onEnabled: 执行");
 
+    }
+
+    private void initWeatherData() {
+        Executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                String weatherjson = Download.doGet("https://weatherapi.coolook.org/getweather");
+                CKLogger.d(weatherjson);
+                if (!TextUtils.isEmpty(weatherjson)) {
+                    try {
+                        String icon = null;
+                        JSONObject weather = new JSONObject(weatherjson);
+                        int count = weather.optInt("count");
+                        int temp = weather.optInt("temp");
+                        String cityname = weather.optString("city_name");
+                        JSONArray jsonArray = weather.optJSONArray("data");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                        }
+                        JSONObject weatherbean = jsonArray.optJSONObject(0);
+                        icon = weatherbean.optJSONObject("weather").optString("icon");
+                        Bitmap bitmap = Download.downloadToBitmap(new StringBuilder()
+                                .append("https://weathericon.coolook.org/icon/")
+                                .append(icon)
+                                .append(".png")
+                                .toString());
+                        Message message = mHandler.obtainMessage();
+                        message.what = WEATHER_SUCCESS;
+                        Weather weaben = new Weather(bitmap, String.valueOf(temp), cityname);
+                        message.obj = weaben;
+                        mHandler.sendMessage(message);
+                    } catch (Exception e) {
+                        ;
+                    }
+                }
+            }
+        });
+    }
+
+    class Weather {
+        Bitmap bitmap;
+        String temp;
+        String cityname;
+
+        public Weather(Bitmap bitmap, String temp, String cityname) {
+            this.bitmap = bitmap;
+            this.temp = temp;
+            this.cityname = cityname;
+        }
     }
 
     @Override
@@ -254,7 +352,7 @@ public class NewAppWidget extends AppWidgetProvider {
      * 显示加载loading
      */
     private static void showLoading(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
         remoteViews.setViewVisibility(R.id.tv_refresh, View.VISIBLE);
         remoteViews.setViewVisibility(R.id.progress_bar, View.VISIBLE);
         remoteViews.setTextViewText(R.id.tv_refresh, "正在刷新...");
@@ -263,7 +361,7 @@ public class NewAppWidget extends AppWidgetProvider {
 
 
     private static void hideLoading(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
 //        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
         remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
         remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
@@ -272,8 +370,8 @@ public class NewAppWidget extends AppWidgetProvider {
 
 
     private static void refreshWidget(Context context, RemoteViews remoteViews, boolean refreshList) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+        appWidgetManager = AppWidgetManager.getInstance(context);
+        componentName = new ComponentName(context, NewAppWidget.class);
         appWidgetManager.updateAppWidget(componentName, remoteViews);
         if (refreshList) {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);

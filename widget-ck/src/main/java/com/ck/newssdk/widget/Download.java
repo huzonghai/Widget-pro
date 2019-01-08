@@ -4,10 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -39,7 +41,7 @@ public class Download {
                 is.close();
                 return bitmap;
             } else {
-                CKLogger.d(String.format(Locale.getDefault(), "code:%d info:%s", responseCode, conn.getHeaderFields().toString()));
+                CKLogger.d(String.format(Locale.getDefault(), "code:%d ", responseCode));
             }
         } catch (Exception e) {
             CKLogger.d("download error" + e);
@@ -56,6 +58,43 @@ public class Download {
         return null;
     }
 
+    public static String doGet(String urlPath) {
+        HttpURLConnection conn = null;
+        if (urlPath == null) {
+            CKLogger.d(" null URL");
+            return null;
+        } else {
+            try {
+                URL url = new URL(urlPath);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3 * 1000);
+                conn.setReadTimeout(6 * 1000);
+                conn.setRequestMethod("GET");
+                InputStream is = null;
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    is = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                    String retData = null;
+                    String responseData = "";
+                    while ((retData = reader.readLine()) != null) {
+                        responseData += retData;
+                    }
+                    is.close();
+                    return responseData;
+                } else {
+                    CKLogger.d(String.format(Locale.getDefault(), "code:%d ", responseCode));
+                }
+
+            } catch (Exception e) {
+                CKLogger.d("doGet error" + e);
+
+            } finally {
+                IOTil.close(conn);
+            }
+        }
+        return null;
+    }
 
     public static File downloadFile(String urlPath, String downloadDir, String picname) {
         if (urlPath == null) {

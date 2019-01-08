@@ -3,7 +3,7 @@ package com.ck.newssdk.widget;
 import android.util.Log;
 
 public class CKLogger {
-    public static final String TAG = "TAG";
+    public static final String TAG = "amb";
     public static boolean ENABLE = true;
 
     public static void setEnable(boolean enable) {

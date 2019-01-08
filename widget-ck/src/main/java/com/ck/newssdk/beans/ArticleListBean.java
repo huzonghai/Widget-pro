@@ -3,9 +3,10 @@ package com.ck.newssdk.beans;
 
 import com.ck.newssdk.base.entity.MultiItemEntity;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class ArticleListBean implements MultiItemEntity {
+public class ArticleListBean implements MultiItemEntity,Serializable {
 
     /**
      * id : 54504913

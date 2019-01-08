@@ -15,15 +15,20 @@
         >
 
         <activity
-            android:name=".widget.CardManageAct"
+            android:name="com.ck.newssdk.widget.CardManageAct"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".widget.SearchAct"
+            android:name="com.ck.newssdk.widget.SearchAct"
             android:screenOrientation="portrait"
             />
 
-        <receiver android:name=".widget.NewAppWidget">
+        <activity
+            android:name="com.ck.newssdk.ui.CkActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+        <receiver android:name="com.ck.newssdk.widget.NewAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="collection_view_action"/>
@@ -38,14 +43,11 @@
         </receiver>
 
         <service
-            android:name=".widget.ListWidgetService"
+            android:name="com.ck.newssdk.widget.ListWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
 
-        <activity
-            android:name=".ui.CkActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
         <activity
             android:name=".ui.web.WebActivity"
             android:launchMode="singleTask"

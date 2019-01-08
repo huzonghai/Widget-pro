@@ -1,4 +1,4 @@
-package com.ck.widget;
+package com.ck.newssdk.widget;
 
 import android.util.Log;
 

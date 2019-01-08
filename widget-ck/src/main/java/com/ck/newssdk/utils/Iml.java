@@ -84,7 +84,7 @@ public class Iml {
         ImageLoader.getInstance().displayImage(imageUrl, image, options);
     }
 
-    private static void setCountry(String countryCode) {
+    public static void setCountry(String countryCode) {
         String s = countryCode.toLowerCase().trim();
         for (String code : country) {
             if (s.equals(code)) {

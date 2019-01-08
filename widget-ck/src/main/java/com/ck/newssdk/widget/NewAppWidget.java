@@ -1,4 +1,4 @@
-package com.ck.widget;
+package com.ck.newssdk.widget;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -15,16 +15,17 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.ck.newssdk.Ck;
+import com.ck.newssdk.R;
 import com.ck.newssdk.beans.ArticleListBean;
 import com.ck.newssdk.config.Configuration;
 import com.ck.newssdk.http.RequestCallback;
 import com.ck.newssdk.utils.DeviceUtils;
+import com.ck.newssdk.utils.Iml;
 import com.ck.newssdk.utils.JsonUtil;
 import com.ck.newssdk.utils.ThreadPoolExecutorUtils;
-import com.ck.widget.api.HttpJsonTask;
+import com.ck.newssdk.widget.api.HttpJsonTask;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class NewAppWidget extends AppWidgetProvider {
 
     private static Context mContext;
     private final static int GETRECOMMEND_SUCCESS = 3;
+    private final static int GETRECOMMEND_FAIL = 4;
     private static boolean isRefresh = false;
 
     @SuppressLint("HandlerLeak")
@@ -59,16 +61,17 @@ public class NewAppWidget extends AppWidgetProvider {
             super.handleMessage(msg);
             switch (msg.what) {
                 case GETRECOMMEND_SUCCESS:
+                    //设置数据
                     ListRemoteViewsFactory.setArticleData((List<ArticleListBean>) msg.obj);
 
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                     ComponentName componentName = new ComponentName(mContext, NewAppWidget.class);
-
                     RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
-
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+
                     if (isRefresh) {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
+                        hideLoading(mContext);
                         isRefresh = false;
                     } else {
                         Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
@@ -79,20 +82,15 @@ public class NewAppWidget extends AppWidgetProvider {
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
                     }
-
 //                    appWidgetManager.updateAppWidget(componentName, remoteViews);
-
                     appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
+                    break;
+                case GETRECOMMEND_FAIL:
+                    hideLoading(mContext);
+                    Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT).show();
                     break;
                 default:
             }
-        }
-    };
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            hideLoading(Utils.getApp());
-            Toast.makeText(Utils.getApp(), "刷新成功", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -103,22 +101,18 @@ public class NewAppWidget extends AppWidgetProvider {
         Intent serach = new Intent().setAction(SEARCH_WIDGET);
         PendingIntent pendingIntentser = PendingIntent.getBroadcast(context, 0, serach, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.re_search, pendingIntentser);
-
         //刷新
         Intent refresh = new Intent().setAction(REFRESH_WIDGET);
         PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_refresh, pendingIntentre);
-
         //加载更多资讯
         Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
         PendingIntent pendingIntentload = PendingIntent.getBroadcast(context, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
-
         //卡片管理
         Intent card = new Intent().setAction(CARD_WIDGET);
         PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
-
 
         //更新widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -144,13 +138,8 @@ public class NewAppWidget extends AppWidgetProvider {
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
-//            AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-//            ComponentName cn = new ComponentName(context, NewAppWidget.class);
-//            ListRemoteViewsFactory.refresh(context);
             initListViewData();
             isRefresh = true;
-//            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.lv_news);
-            mHandler.postDelayed(runnable, 2000);
             showLoading(context);
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
             Ck.init(context, "us");
@@ -214,7 +203,7 @@ public class NewAppWidget extends AppWidgetProvider {
      */
     private static void initListViewData() {
         String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
-        Ck.init(mContext, countryCode);
+        Iml.setCountry(countryCode);
         getRecommend(mContext, Configuration.CurrentCountry);
     }
 
@@ -242,16 +231,53 @@ public class NewAppWidget extends AppWidgetProvider {
                             message.what = GETRECOMMEND_SUCCESS;
                             message.obj = articleListBeans;
                             mHandler.sendMessage(message);
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
+                            Message messagefail = mHandler.obtainMessage();
+                            messagefail.what = GETRECOMMEND_FAIL;
+                            mHandler.sendMessage(messagefail);
                             e.printStackTrace();
                         }
                     }
 
                     @Override
                     public void onFailure(String message) {
+                        Message messagefail = mHandler.obtainMessage();
+                        messagefail.what = GETRECOMMEND_FAIL;
+                        mHandler.sendMessage(messagefail);
                     }
                 });
         ThreadPoolExecutorUtils.getInstance().execute(task);
+    }
+
+
+    /**
+     * 显示加载loading
+     */
+    private static void showLoading(Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        remoteViews.setViewVisibility(R.id.tv_refresh, View.VISIBLE);
+        remoteViews.setViewVisibility(R.id.progress_bar, View.VISIBLE);
+        remoteViews.setTextViewText(R.id.tv_refresh, "正在刷新...");
+        refreshWidget(context, remoteViews, false);
+    }
+
+
+    private static void hideLoading(Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+//        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
+        remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
+        remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
+        refreshWidget(context, remoteViews, false);
+    }
+
+
+    private static void refreshWidget(Context context, RemoteViews remoteViews, boolean refreshList) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName componentName = new ComponentName(context, NewAppWidget.class);
+        appWidgetManager.updateAppWidget(componentName, remoteViews);
+        if (refreshList) {
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
+        }
     }
 
     private static List<ArticleListBean> handleData(List<ArticleListBean> list) {
@@ -276,41 +302,6 @@ public class NewAppWidget extends AppWidgetProvider {
         }
         return data;
     }
-
-    /**
-     * 显示加载loading
-     */
-    private void showLoading(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-        remoteViews.setViewVisibility(R.id.tv_refresh, View.VISIBLE);
-        remoteViews.setViewVisibility(R.id.progress_bar, View.VISIBLE);
-        remoteViews.setTextViewText(R.id.tv_refresh, "正在刷新...");
-        refreshWidget(context, remoteViews, false);
-    }
-
-    /**
-     * 隐藏加载loading
-     */
-    private void hideLoading(Context context) {
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-//        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
-        remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
-        remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
-        refreshWidget(context, remoteViews, false);
-    }
-
-    /**
-     * 刷新Widget
-     */
-    private void refreshWidget(Context context, RemoteViews remoteViews, boolean refreshList) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        ComponentName componentName = new ComponentName(context, NewAppWidget.class);
-        appWidgetManager.updateAppWidget(componentName, remoteViews);
-        if (refreshList) {
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
-        }
-    }
-
 
 }
 

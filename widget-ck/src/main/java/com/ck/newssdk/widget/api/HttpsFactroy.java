@@ -1,4 +1,4 @@
-package com.ck.widget.api;
+package com.ck.newssdk.widget.api;
 
 import android.content.Context;
 

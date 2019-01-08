@@ -1,4 +1,4 @@
-package com.ck.widget;
+package com.ck.newssdk.widget;
 
 import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.ck.newssdk.R;
 import com.ck.newssdk.beans.ArticleListBean;
 
 import java.util.List;

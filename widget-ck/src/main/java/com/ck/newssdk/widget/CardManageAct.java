@@ -1,4 +1,4 @@
-package com.ck.widget;
+package com.ck.newssdk.widget;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+
+import com.ck.newssdk.R;
 
 public class CardManageAct extends Activity implements View.OnClickListener {
     private CheckBox mCheckBoxSearck, mCheckBoxWeather;
@@ -61,15 +63,11 @@ public class CardManageAct extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        switch (id) {
-            case R.id.imgv_back:
-                finish();
-                break;
-            case R.id.select_cb_searck:
-                break;
-            case R.id.select_cb_weather:
-                break;
-            default:
+        if (id == R.id.imgv_back) {
+            finish();
+        } else if (id == R.id.select_cb_searck) {
+        } else if (id == R.id.select_cb_weather) {
+        } else {
         }
     }
 

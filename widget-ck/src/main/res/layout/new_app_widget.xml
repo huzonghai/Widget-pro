@@ -1,5 +1,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -28,7 +29,6 @@
             android:layout_marginLeft="6dp"
             android:layout_toRightOf="@id/imgv_ser"
             android:gravity="center_vertical"
-            android:text="Xi Jinping visits the United States"
             android:textColor="#7dffffff"
             android:textSize="14sp"
             />
@@ -51,7 +51,8 @@
             android:layout_marginBottom="17dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="17dp"
-            android:src="@mipmap/weather_snow"/>
+            android:src="@mipmap/weather_snow"
+            />
 
         <TextView
             android:id="@+id/tv_weather_centigrade"
@@ -59,9 +60,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_toRightOf="@id/imgv_weather"
-            android:text="-26°C"
+            android:text="-26℃"
             android:textColor="#000000"
-            android:textSize="24sp"
+            android:textSize="20sp"
             />
 
         <TextView
@@ -71,35 +72,37 @@
             android:layout_below="@+id/tv_weather_centigrade"
             android:layout_toRightOf="@id/imgv_weather"
             android:gravity="center_vertical"
-            android:text="Wednesday"
+            android:text="北京"
             android:textColor="#000000"
             android:textSize="14sp"
             />
 
-        <TextView
+        <TextClock
             android:id="@+id/tv_weather_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
             android:layout_marginTop="10dp"
+            android:format24Hour="HH:mm"
             android:text="16:30"
             android:textColor="#000000"
-            android:textSize="23sp"
-            />
+            android:textSize="20sp"
+            tools:ignore="NewApi"/>
 
-        <TextView
+        <TextClock
             android:id="@+id/tv_weather_year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_weather_time"
             android:layout_marginRight="15dp"
+            android:format24Hour="yyyy/MM/dd"
             android:gravity="center_vertical"
             android:text="2018/12/24"
             android:textColor="#000000"
             android:textSize="14sp"
-            />
+            tools:ignore="NewApi"/>
 
     </RelativeLayout>
 

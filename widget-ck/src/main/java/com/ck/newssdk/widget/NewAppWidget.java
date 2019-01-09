@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.ck.newssdk.Ck;
 import com.ck.newssdk.R;
 import com.ck.newssdk.beans.ArticleListBean;
 import com.ck.newssdk.config.Configuration;
@@ -47,9 +46,10 @@ public class NewAppWidget extends AppWidgetProvider {
     public static final String REFRESH_WIDGET = "refresh_widget";
     public static final String SEARCH_WIDGET = "serach_widget";
     public static final String CARD_WIDGET = "card_widget";
-    public static final String CARD_FORM_ACT = "card_for_act";
     public static final String LOAD_MORE_NEWS_WIDGET = "load_more_news_widget";
     public static final String COLLECTION_VIEW_ACTION = "collection_view_action";
+
+    public static final String CARD_FORM_ACT = "card_for_act";
 
     public static final String COLLECTION_VIEW_EXTRA = "collection_view_extra";
     public static final String COLLECTION_VIEW_BEAN_EXTRA = "collection_view_bean_extra";
@@ -84,16 +84,16 @@ public class NewAppWidget extends AppWidgetProvider {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
                         hideLoading(mContext);
                         isRefresh = false;
-                    } else {
-                        Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
-                        remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
-                        Intent listIntent = new Intent();
-                        listIntent.setAction(COLLECTION_VIEW_ACTION);
-//                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                        listIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
                     }
+                    Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
+                    remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
+
+                    Intent listIntent = new Intent();
+                    listIntent.setAction(COLLECTION_VIEW_ACTION);
+//                    listIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                    listIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
 //                    appWidgetManager.updateAppWidget(componentName, remoteViews);
                     appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
                     break;
@@ -109,7 +109,6 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
                     remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
-                    CKLogger.d(weather.temp + weather.cityname);
                     appWidgetManager.updateAppWidget(componentName, remoteViews);
                     break;
                 case WEATHER_FAIL://展示默认图标
@@ -119,6 +118,7 @@ public class NewAppWidget extends AppWidgetProvider {
             }
         }
     };
+
 
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
@@ -149,7 +149,7 @@ public class NewAppWidget extends AppWidgetProvider {
     }
 
     private void jumpToWeb(ArticleListBean news) {
-        Iml.initIml(mContext);
+
         Intent intent = new Intent(mContext, WebActivity.class);
         intent.putExtra("linkurl", news.getLinkurl());
         intent.putExtra("sourceurl", news.getSourceurl());
@@ -163,13 +163,11 @@ public class NewAppWidget extends AppWidgetProvider {
         mContext = context;
         String action = intent.getAction();
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-        //list
         if (action.equals(COLLECTION_VIEW_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int index = intent.getIntExtra(COLLECTION_VIEW_EXTRA, 0);
             ArticleListBean articleListBean = (ArticleListBean) intent.getSerializableExtra(COLLECTION_VIEW_BEAN_EXTRA);
             jumpToWeb(articleListBean);
-            Toast.makeText(context, "item" + index, Toast.LENGTH_SHORT).show();
         } else if (action.equals(SEARCH_WIDGET)) {
             String url = "http://s.zlsite.com/?channel=50109";
             Intent startAcIntent = new Intent();
@@ -182,10 +180,12 @@ public class NewAppWidget extends AppWidgetProvider {
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
             initListViewData();
+            initWeatherData();
             isRefresh = true;
             showLoading(context);
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
-            Ck.init(context, "us");
+            String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
+            Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
 //            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
@@ -200,31 +200,29 @@ public class NewAppWidget extends AppWidgetProvider {
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
             if (intent != null) {
-                int type = intent.getIntExtra("type", 2);
-                switch (type) {
-                    case 0:
-                        boolean checkser = intent.getBooleanExtra("check", true);
-                        remoteViews.setViewVisibility(R.id.re_search, checkser == true ? View.VISIBLE : View.GONE);
-                        break;
-                    case 1:
-                        boolean checkwea = intent.getBooleanExtra("check", true);
-                        remoteViews.setViewVisibility(R.id.re_weather, checkwea == true ? View.VISIBLE : View.GONE);
-                        break;
-                    default:
-                }
+                remoteViews.setViewVisibility(R.id.re_search,
+                        intent.getBooleanExtra("isCheckSearch", true) == true
+                                ? View.VISIBLE : View.GONE);
+                remoteViews.setViewVisibility(R.id.re_weather,
+                        intent.getBooleanExtra("isCheckWeather", true) == true
+                                ? View.VISIBLE : View.GONE);
+                appWidgetManager = AppWidgetManager.getInstance(context);
+                componentName = new ComponentName(context, NewAppWidget.class);
+                appWidgetManager.updateAppWidget(componentName, remoteViews);
             }
-            appWidgetManager = AppWidgetManager.getInstance(context);
-            componentName = new ComponentName(context, NewAppWidget.class);
-            appWidgetManager.updateAppWidget(componentName, remoteViews);
         }
 
+
         Log.i(TAG, "onReceive: 执行");
+        Iml.initIml(mContext);
         super.onReceive(context, intent);
     }
+
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         mContext = context;
+        Iml.initIml(mContext);
         //初始化列表数据
         initListViewData();
         //天气
@@ -240,7 +238,7 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         mContext = context;
-
+        Iml.initIml(mContext);
     }
 
     private void initWeatherData() {
@@ -251,24 +249,23 @@ public class NewAppWidget extends AppWidgetProvider {
                 CKLogger.d(weatherjson);
                 if (!TextUtils.isEmpty(weatherjson)) {
                     try {
-                        String icon = null;
-                        JSONObject weather = new JSONObject(weatherjson);
-                        int count = weather.optInt("count");
-                        int temp = weather.optInt("temp");
-                        String cityname = weather.optString("city_name");
-                        JSONArray jsonArray = weather.optJSONArray("data");
-                        for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = new JSONObject(weatherjson);
+                        int count = jsonObject.optInt("count");
+                        JSONArray weather = jsonObject.optJSONArray("data");
+                        for (int i = 0; i < weather.length(); i++) {
                         }
-                        JSONObject weatherbean = jsonArray.optJSONObject(0);
-                        icon = weatherbean.optJSONObject("weather").optString("icon");
+                        JSONObject weatherbean = weather.optJSONObject(0);
                         Bitmap bitmap = Download.downloadToBitmap(new StringBuilder()
                                 .append("https://weathericon.coolook.org/icon/")
-                                .append(icon)
+                                .append(weatherbean.optJSONObject("weather").optString("icon"))
                                 .append(".png")
                                 .toString());
                         Message message = mHandler.obtainMessage();
                         message.what = WEATHER_SUCCESS;
-                        Weather weaben = new Weather(bitmap, String.valueOf(temp), cityname);
+                        Weather weaben = new Weather(bitmap, new StringBuilder()
+                                .append(weatherbean.optInt("temp")).
+                                        append("℃").toString(),
+                                weatherbean.optString("city_name"));
                         message.obj = weaben;
                         mHandler.sendMessage(message);
                     } catch (Exception e) {

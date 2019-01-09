@@ -75,7 +75,7 @@ public class BaseActivity extends AppCompatActivity {
             public IPagerTitleView getTitleView(Context context, final int index) {
                 ClipPagerTitleView clipPagerTitleView = new ClipPagerTitleView(context);
                 clipPagerTitleView.setText(topics.get(index));
-                clipPagerTitleView.setTextSize(50);
+                clipPagerTitleView.setTextSize(28);
                 clipPagerTitleView.setTextColor(Color.parseColor("#99ffffff"));
                 clipPagerTitleView.setClipColor(Color.WHITE);
                 clipPagerTitleView.setOnClickListener(new View.OnClickListener() {

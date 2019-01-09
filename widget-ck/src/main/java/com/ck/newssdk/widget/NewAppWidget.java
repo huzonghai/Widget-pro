@@ -276,6 +276,8 @@ public class NewAppWidget extends AppWidgetProvider {
         });
     }
 
+
+
     class Weather {
         Bitmap bitmap;
         String temp;

@@ -17,7 +17,6 @@ import com.ck.newssdk.R;
 import com.ck.newssdk.ui.CkFragment;
 import com.ck.newssdk.utils.indicator.MagicIndicator;
 import com.ck.newssdk.utils.indicator.ViewPagerHelper;
-import com.ck.newssdk.utils.indicator.buildins.UIUtil;
 import com.ck.newssdk.utils.indicator.buildins.commonnavigator.CommonNavigator;
 import com.ck.newssdk.utils.indicator.buildins.commonnavigator.abs.CommonNavigatorAdapter;
 import com.ck.newssdk.utils.indicator.buildins.commonnavigator.abs.IPagerIndicator;
@@ -53,12 +52,12 @@ public class BaseActivity extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         noNet = findViewById(R.id.no_net_iv);
 
-        mIndicator.setBackgroundColor(Color.parseColor("#FF9400"));
+        mIndicator.setBackgroundColor(Color.parseColor("#FFFFFF"));
 
         mCommonNavigator = new CommonNavigator(this);
         mCommonNavigator.setSkimOver(true);
-        mCommonNavigator.setRightPadding(UIUtil.getScreenWidth(this) / 2);
-        mCommonNavigator.setLeftPadding(UIUtil.getScreenWidth(this) / 2);
+//        mCommonNavigator.setRightPadding(UIUtil.getScreenWidth(this) / 2);
+//        mCommonNavigator.setLeftPadding(UIUtil.getScreenWidth(this) / 2);
         mAdapter = new CkPageAdapter(getSupportFragmentManager());
     }
 
@@ -75,9 +74,10 @@ public class BaseActivity extends AppCompatActivity {
             public IPagerTitleView getTitleView(Context context, final int index) {
                 ClipPagerTitleView clipPagerTitleView = new ClipPagerTitleView(context);
                 clipPagerTitleView.setText(topics.get(index));
-                clipPagerTitleView.setTextSize(28);
-                clipPagerTitleView.setTextColor(Color.parseColor("#99ffffff"));
-                clipPagerTitleView.setClipColor(Color.WHITE);
+                clipPagerTitleView.setTextSize(30);
+                clipPagerTitleView.setTextColor(Color.parseColor("#000000"));
+//                clipPagerTitleView.setClipColor(Color.WHITE);//#FF9400  //#888888
+                clipPagerTitleView.setClipColor(Color.parseColor("#FF9400"));
                 clipPagerTitleView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

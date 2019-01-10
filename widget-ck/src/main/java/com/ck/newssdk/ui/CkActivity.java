@@ -25,14 +25,18 @@ public class CkActivity extends BaseActivity implements CkView.View {
 
     @Override
     public void onGetTopics(List<CategoryBean> categoryBeanList) {
-        for (CategoryBean b : categoryBeanList) {
-            int topicid = b.getTopicid();
-            if (topicid != 115) {
-                topics.add(b.getTopicname());
-                fragments.add(CkFragment.newInstance(topicid));
+        if (categoryBeanList != null) {
+            for (CategoryBean b : categoryBeanList) {
+                int topicid = b.getTopicid();
+                if (topicid != 115) {
+                    topics.add(b.getTopicname());
+                    fragments.add(CkFragment.newInstance(topicid));
+                }
             }
+
+            initNavigator();
+
         }
-        initNavigator();
     }
 
     @Override

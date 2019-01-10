@@ -51,18 +51,18 @@
             android:layout_marginBottom="17dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="17dp"
-            android:src="@mipmap/weather_snow"
+            android:src="@mipmap/icon_wea"
             />
 
         <TextView
             android:id="@+id/tv_weather_centigrade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:layout_toRightOf="@id/imgv_weather"
             android:text="-26℃"
             android:textColor="#000000"
-            android:textSize="20sp"
+            android:textSize="21sp"
             />
 
         <TextView
@@ -70,11 +70,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_weather_centigrade"
+            android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/imgv_weather"
             android:gravity="center_vertical"
             android:text="北京"
             android:textColor="#000000"
-            android:textSize="14sp"
+            android:textSize="13sp"
             />
 
         <TextClock
@@ -83,11 +84,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:format24Hour="HH:mm"
             android:text="16:30"
             android:textColor="#000000"
-            android:textSize="20sp"
+            android:textSize="21sp"
             tools:ignore="NewApi"/>
 
         <TextClock
@@ -97,11 +98,12 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_weather_time"
             android:layout_marginRight="15dp"
+            android:layout_marginTop="4dp"
             android:format24Hour="yyyy/MM/dd"
             android:gravity="center_vertical"
             android:text="2018/12/24"
             android:textColor="#000000"
-            android:textSize="14sp"
+            android:textSize="13sp"
             tools:ignore="NewApi"/>
 
     </RelativeLayout>

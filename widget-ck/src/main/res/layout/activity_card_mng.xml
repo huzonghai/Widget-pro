@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="#f6f6f6"
               android:orientation="vertical"
     >
 
     <RelativeLayout
         android:id="@+id/re_search"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="43dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
         android:background="#fff"
 
         >
@@ -49,7 +49,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:text="Intelligent display"
-        android:textColor="#ff7d7d7d"
+        android:textColor="#7D7D7D"
         android:textSize="13sp"
         />
 
@@ -78,7 +78,7 @@
             android:layout_toRightOf="@+id/card_ser"
             android:gravity="center"
             android:text="Search"
-            android:textColor="#ff7d7d7d"
+            android:textColor="#7D7D7D"
             android:textSize="15sp"
             />
 
@@ -101,7 +101,7 @@
         android:layout_height="44dp"
         android:layout_marginLeft="7dp"
         android:layout_marginRight="7dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/shape_card_manage_item_bg"
         >
 
@@ -121,7 +121,7 @@
             android:layout_toRightOf="@+id/card_weather"
             android:gravity="center"
             android:text="Weather"
-            android:textColor="#ff7d7d7d"
+            android:textColor="#7D7D7D"
             android:textSize="15sp"
             />
 

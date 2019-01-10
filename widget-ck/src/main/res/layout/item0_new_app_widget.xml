@@ -1,0 +1,34 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_widget_item"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:orientation="horizontal"
+    >
+
+
+    <ImageView
+        android:id="@+id/imgv_pic"
+        android:layout_width="92dp"
+        android:layout_height="67dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="9dp"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/weather_snow"
+        />
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="9dp"
+        android:layout_marginRight="9dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:text="2018/12/24"
+        android:textColor="#ff424242"
+        android:textSize="13sp"
+        />
+
+</LinearLayout>

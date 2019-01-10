@@ -1,0 +1,66 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_widget_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <ImageView
+            android:id="@+id/imgv_pic_2_0"
+            android:layout_width="0dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="9dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:src="@mipmap/weather_snow"
+            />
+
+        <ImageView
+            android:id="@+id/imgv_pic_2_1"
+            android:layout_width="0dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:src="@mipmap/weather_snow"
+            />
+
+        <ImageView
+            android:id="@+id/imgv_pic_2_2"
+            android:layout_width="0dp"
+            android:layout_height="67dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="9dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:src="@mipmap/weather_snow"
+            />
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_text_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="7dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:text="2018/12/24"
+        android:textColor="#ff424242"
+        android:textSize="13sp"
+        />
+
+</LinearLayout>

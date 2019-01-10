@@ -29,6 +29,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private final static int SUCCESS = 0;
     private final static int FAIL = 1;
     private static RemoteViews remoteViews;
+
+    public static final int TEXT = 1;
+    public static final int IMG = 2;
+    public static final int BIG_IMG = 3;
+    public static final int THREE_IMG = 4;
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
         @Override
@@ -77,12 +82,29 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
 
-        remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item_new_app_widget);
-
         ArticleListBean articleListBean = mArticleListBeanList.get(position);
+        int itemType = articleListBean.getItemType();
+        switch (itemType) {
+            case IMG:
+                remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item0_new_app_widget);
+                remoteViews.setImageViewBitmap(R.id.imgv_pic, Download.downloadToBitmap(articleListBean.getImgs()[0]));
+                remoteViews.setTextViewText(R.id.tv_text, articleListBean.getTitle());
+                break;
+            case BIG_IMG:
+                remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item1_new_app_widget);
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_1, Download.downloadToBitmap(articleListBean.getImgs()[0]));
+                remoteViews.setTextViewText(R.id.tv_text_1, articleListBean.getTitle());
+                break;
+            case THREE_IMG:
+                remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item2_new_app_widget);
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_0, Download.downloadToBitmap(articleListBean.getImgs()[0]));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_1, Download.downloadToBitmap(articleListBean.getImgs()[1]));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_2, Download.downloadToBitmap(articleListBean.getImgs()[2]));
+                remoteViews.setTextViewText(R.id.tv_text_2, articleListBean.getTitle());
+                break;
+            default:
+        }
 
-        remoteViews.setImageViewBitmap(R.id.imgv_pic, Download.downloadToBitmap(articleListBean.getTitlepic()));
-        remoteViews.setTextViewText(R.id.tv_text, articleListBean.getTitle());
 
 //        if (mArticleListBeanList != null) {
 //            for (int i = 0; i < mArticleListBeanList.size(); i++) {
@@ -158,15 +180,13 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         initListViewData();
     }
 
-
     @Override
     public int getCount() {
-        return mArticleListBeanList.size();
+        return mArticleListBeanList != null ? mArticleListBeanList.size() : null;
     }
 
     @Override
     public long getItemId(int position) {
-        // 返回当前项在“集合视图”中的位置
         return position;
     }
 
@@ -177,7 +197,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 3;
     }
 
     @Override

@@ -123,6 +123,13 @@ public class NewAppWidget extends AppWidgetProvider {
     private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
 
+
+        remoteViews.setViewVisibility(R.id.re_search,
+                SPUtils.getCbStateSearch(mContext) == true
+                        ? View.VISIBLE : View.GONE);
+        remoteViews.setViewVisibility(R.id.re_weather,
+                SPUtils.getCbStateWeather(mContext) == true
+                        ? View.VISIBLE : View.GONE);
         //搜索
         Intent serach = new Intent().setAction(SEARCH_WIDGET);
         serach.setComponent(new ComponentName(context, NewAppWidget.class));
@@ -173,8 +180,8 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
             //launcher:packageName="com.ssui.launcher3"
 //            launcher:className="com.ck.newssdk.widget.NewAppWidget"
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -188,14 +195,14 @@ public class NewAppWidget extends AppWidgetProvider {
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -275,7 +282,6 @@ public class NewAppWidget extends AppWidgetProvider {
             }
         });
     }
-
 
 
     class Weather {

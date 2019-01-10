@@ -1,32 +1,32 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rl_widget_item"
+    android:id="@+id/rl_widget_item_1"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:layout_marginTop="8dp"
-    android:background="@drawable/shape_weather_bg"
-    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     >
 
 
     <ImageView
-        android:id="@+id/imgv_pic"
-        android:layout_width="92dp"
-        android:layout_height="67dp"
+        android:id="@+id/imgv_pic_1"
+        android:layout_width="match_parent"
+        android:layout_height="142dp"
         android:layout_gravity="center_vertical"
-        android:layout_margin="15dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginRight="9dp"
+        android:scaleType="fitXY"
         android:src="@mipmap/weather_snow"
         />
 
     <TextView
-        android:id="@+id/tv_text"
+        android:id="@+id/tv_text_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="9dp"
         android:layout_marginRight="15dp"
-        android:maxLines="3"
+        android:layout_marginTop="7dp"
         android:ellipsize="end"
+        android:maxLines="3"
         android:text="2018/12/24"
         android:textColor="#ff424242"
         android:textSize="13sp"

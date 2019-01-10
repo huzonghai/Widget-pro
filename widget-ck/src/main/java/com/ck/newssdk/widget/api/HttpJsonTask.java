@@ -173,11 +173,13 @@ public class HttpJsonTask implements Runnable {
                 final String error = Integer.toString(connection.getResponseCode());
                 Log.e("HttpTask", Integer.toString(connection.getResponseCode()));
                 Log.e("HttpTask", "fail");
+                callback.onFailure(error);
+
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-
+            callback.onFailure(e.toString());
         }
     }
 

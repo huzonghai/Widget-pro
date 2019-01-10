@@ -154,17 +154,20 @@
 
                 <ProgressBar
                     android:id="@+id/progress_bar"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:indeterminateTint="#D81B60"
-                    android:indeterminateTintMode="src_atop"
-                    android:visibility="gone"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@drawable/progressbar_st"
                     />
+                <!--android:visibility="gone"-->
+
                 <!--android:layout_gravity="center"-->
                 <!--android:indeterminate="false"-->
                 <!--android:indeterminateBehavior="cycle"-->
                 <!--android:indeterminateDrawable="@mipmap/ic_reno"-->
 
+                <!--android:indeterminateTint="#D81B60"-->
+                <!--android:indeterminateTintMode="src_atop"-->
 
                 <TextView
                     android:id="@+id/tv_refresh"

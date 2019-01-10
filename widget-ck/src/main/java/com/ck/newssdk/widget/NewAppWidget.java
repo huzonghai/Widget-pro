@@ -370,6 +370,7 @@ public class NewAppWidget extends AppWidgetProvider {
 //        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
         remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
         remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
+//        remoteViews.setProgressBar();
         refreshWidget(context, remoteViews, false);
     }
 

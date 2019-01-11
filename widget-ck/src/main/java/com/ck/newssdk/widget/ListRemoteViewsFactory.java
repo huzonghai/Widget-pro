@@ -182,7 +182,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return mArticleListBeanList != null ? mArticleListBeanList.size() : null;
+        return mArticleListBeanList != null ? mArticleListBeanList.size() : 0;
     }
 
     @Override

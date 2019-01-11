@@ -1,6 +1,9 @@
 package com.ck.newssdk.widget;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.io.Closeable;
 import java.net.HttpURLConnection;
@@ -22,10 +25,20 @@ public class IOTil {
             try {
                 closeable.close();
             } catch (Exception e) {
-               ;
+                ;
             }
 
         }
     }
 
+    public static boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
+    }
 }

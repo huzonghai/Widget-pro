@@ -63,6 +63,7 @@ public class NewAppWidget extends AppWidgetProvider {
     private static RemoteViews remoteViews;
     private static AppWidgetManager appWidgetManager;
     private static ComponentName componentName;
+    private static List<ArticleListBean> articleListBeanList;
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -72,8 +73,10 @@ public class NewAppWidget extends AppWidgetProvider {
             switch (msg.what) {
 
                 case GETRECOMMEND_SUCCESS:
+
                     //设置数据
-                    ListRemoteViewsFactory.setArticleData((List<ArticleListBean>) msg.obj);
+                    articleListBeanList = (List<ArticleListBean>) msg.obj;
+                    ListRemoteViewsFactory.setArticleData(articleListBeanList);
 
                     appWidgetManager = AppWidgetManager.getInstance(mContext);
                     componentName = new ComponentName(mContext, NewAppWidget.class);
@@ -139,7 +142,7 @@ public class NewAppWidget extends AppWidgetProvider {
         Intent refresh = new Intent().setAction(REFRESH_WIDGET);
         refresh.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.tv_refresh, pendingIntentre);
+        remoteViews.setOnClickPendingIntent(R.id.progress_bar_static, pendingIntentre);
         //加载更多资讯
         Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
         loadnews.setComponent(new ComponentName(context, NewAppWidget.class));
@@ -180,29 +183,27 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
             //launcher:packageName="com.ssui.launcher3"
 //            launcher:className="com.ck.newssdk.widget.NewAppWidget"
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
-            initListViewData();
-            initWeatherData();
-            isRefresh = true;
-            showLoading(context);
+            loadingData();
+
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
             String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -217,12 +218,38 @@ public class NewAppWidget extends AppWidgetProvider {
                 componentName = new ComponentName(context, NewAppWidget.class);
                 appWidgetManager.updateAppWidget(componentName, remoteViews);
             }
-        }
+        } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+            //main_no_net_weather
+            //main_no_net
+            if (IOTil.isNetworkConnected(mContext)) {
+                if (articleListBeanList == null) {
+                    loadingData();
+                } else {
+                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
+                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+                }
+            } else {
+                if (articleListBeanList == null) {
+                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
+                    remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
+                }
 
+            }
+            appWidgetManager = AppWidgetManager.getInstance(context);
+            componentName = new ComponentName(context, NewAppWidget.class);
+            appWidgetManager.updateAppWidget(componentName, remoteViews);
+        }
 
         Log.i(TAG, "onReceive: 执行");
         Iml.initIml(mContext);
         super.onReceive(context, intent);
+    }
+
+    private void loadingData() {
+        initListViewData();
+        initWeatherData();
+        isRefresh = true;
+        showLoading(mContext);
     }
 
 
@@ -358,19 +385,17 @@ public class NewAppWidget extends AppWidgetProvider {
      */
     private static void showLoading(Context context) {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-        remoteViews.setViewVisibility(R.id.tv_refresh, View.VISIBLE);
+        remoteViews.setViewVisibility(R.id.progress_bar_static, View.GONE);
         remoteViews.setViewVisibility(R.id.progress_bar, View.VISIBLE);
-        remoteViews.setTextViewText(R.id.tv_refresh, "正在刷新...");
+//        remoteViews.setEmptyView(R.id.lv_news,R.id.re_enty);
         refreshWidget(context, remoteViews, false);
     }
 
 
     private static void hideLoading(Context context) {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
-//        progress.startAnimation(AnimationUtils.loadAnimation(context,R.anim.pull_pro_anim));
+        remoteViews.setViewVisibility(R.id.progress_bar_static, View.VISIBLE);
         remoteViews.setViewVisibility(R.id.progress_bar, View.GONE);
-        remoteViews.setTextViewText(R.id.tv_refresh, "刷新");
-//        remoteViews.setProgressBar();
         refreshWidget(context, remoteViews, false);
     }
 

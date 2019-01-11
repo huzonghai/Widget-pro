@@ -11,24 +11,22 @@
     <uses-permission android:name="android.permission.ACCESS_ALL_DOWNLOADS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <application
-        >
-
+    <application>
         <activity
-            android:name="com.ck.newssdk.widget.CardManageAct"
-            android:screenOrientation="portrait"
-            />
+            android:name=".widget.CardManageAct"
+            android:screenOrientation="portrait"/>
         <activity
-            android:name="com.ck.newssdk.widget.SearchAct"
-            android:screenOrientation="portrait"
-            />
-
+            android:name=".widget.SearchAct"
+            android:screenOrientation="portrait"/>
         <activity
-            android:name="com.ck.newssdk.ui.CkActivity"
+            android:name=".ui.CkActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
-        <receiver android:name="com.ck.newssdk.widget.NewAppWidget">
+        <receiver android:name=".widget.NewAppWidget">
+            <intent-filter android:priority="1000">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="collection_view_action"/>
@@ -37,16 +35,15 @@
                 <action android:name="load_more_news_widget"/>
                 <action android:name="card_widget"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_app_widget_info"/>
         </receiver>
 
         <service
-            android:name="com.ck.newssdk.widget.ListWidgetService"
+            android:name=".widget.ListWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
-
-
 
         <activity
             android:name=".ui.web.WebActivity"

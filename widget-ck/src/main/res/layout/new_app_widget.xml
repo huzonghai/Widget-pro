@@ -34,6 +34,7 @@
             />
     </RelativeLayout>
 
+
     <RelativeLayout
         android:id="@+id/re_weather"
         android:layout_width="match_parent"
@@ -51,8 +52,8 @@
             android:layout_marginBottom="17dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="17dp"
-            android:src="@mipmap/icon_wea"
             />
+        <!--android:src="@mipmap/icon_wea"-->
 
         <TextView
             android:id="@+id/tv_weather_centigrade"
@@ -60,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_toRightOf="@id/imgv_weather"
-            android:text="-26℃"
+            android:text=""
             android:textColor="#000000"
             android:textSize="21sp"
             />
@@ -73,7 +74,7 @@
             android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/imgv_weather"
             android:gravity="center_vertical"
-            android:text="北京"
+            android:text=""
             android:textColor="#000000"
             android:textSize="13sp"
             />
@@ -101,12 +102,22 @@
             android:layout_marginTop="4dp"
             android:format24Hour="yyyy/MM/dd"
             android:gravity="center_vertical"
-            android:text="2018/12/24"
+            android:text="2019/01/01"
             android:textColor="#000000"
             android:textSize="13sp"
             tools:ignore="NewApi"/>
 
     </RelativeLayout>
+
+    <include
+        android:id="@+id/main_no_net_weather"
+        layout="@layout/net_work_enty_weather"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/re_search"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -145,10 +156,10 @@
                 android:textSize="15sp"
                 />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -156,29 +167,22 @@
                     android:id="@+id/progress_bar"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:layout_marginRight="13dp"
                     android:indeterminate="true"
                     android:indeterminateDrawable="@drawable/progressbar_st"
+                    android:visibility="gone"
                     />
-                <!--android:visibility="gone"-->
 
-                <!--android:layout_gravity="center"-->
-                <!--android:indeterminate="false"-->
-                <!--android:indeterminateBehavior="cycle"-->
-                <!--android:indeterminateDrawable="@mipmap/ic_reno"-->
-
-                <!--android:indeterminateTint="#D81B60"-->
-                <!--android:indeterminateTintMode="src_atop"-->
-
-                <TextView
-                    android:id="@+id/tv_refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ProgressBar
+                    android:id="@+id/progress_bar_static"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_marginRight="13dp"
-                    android:text="刷新"
-                    android:textColor="#ff424242"
-                    android:textSize="13sp"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@mipmap/ic_reno"
                     />
-            </LinearLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
@@ -191,6 +195,17 @@
             android:background="#00000000"
             android:dividerHeight="0.5dp"
             android:gravity="center"/>
+
+        <include
+            android:id="@+id/main_no_net"
+            layout="@layout/net_work_enty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tv_more"
+            android:layout_below="@+id/re_refresh"
+            android:visibility="gone"
+            />
+
 
         <TextView
             android:id="@+id/tv_more"

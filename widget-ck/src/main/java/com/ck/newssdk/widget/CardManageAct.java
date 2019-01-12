@@ -42,27 +42,34 @@ public class CardManageAct extends Activity implements View.OnClickListener {
     }
 
     private void initClick() {
-        mCheckBoxSearck.setChecked(SPUtils.getCbStateSearch(this));
-        mCheckBoxWeather.setChecked(SPUtils.getCbStateWeather(this));
+        isCheckSearch = SPUtils.getCbStateSearch(this);
+        isCheckWeather = SPUtils.getCbStateWeather(this);
 
+        mCheckBoxSearck.setChecked(isCheckSearch);
+        mCheckBoxWeather.setChecked(isCheckWeather);
+        System.out.println("AA-CardManageAct-CbStateSearch--> " + SPUtils.getCbStateSearch(this));
+        System.out.println("AA-CardManageAct-CbStateWeather--> " + SPUtils.getCbStateWeather(this));
         mCheckBoxSearck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
-                SPUtils.saveCbStateSearch(CardManageAct.this, isCheck);
                 isCheckSearch = isCheck;
+                System.out.println("AA-CardManageAct.点击了Searck-->" + isCheck);
             }
         });
         mCheckBoxWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
-                SPUtils.saveCbStateWeather(CardManageAct.this, isCheck);
                 isCheckWeather = isCheck;
+                System.out.println("AA-CardManageAct.点击了Weather-->" + isCheck);
+
             }
         });
     }
 
 
     private void doCallback() {
+        SPUtils.saveCbStateSearch(CardManageAct.this, isCheckSearch);
+        SPUtils.saveCbStateWeather(CardManageAct.this, isCheckWeather);
         NewAppWidget newAppWidget = new NewAppWidget();
         Intent intent = new Intent(CARD_FORM_ACT);
         intent.putExtra("isCheckSearch", isCheckSearch);

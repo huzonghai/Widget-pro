@@ -9,4 +9,5 @@ public class ListWidgetService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new ListRemoteViewsFactory(this, intent);
     }
+
 }

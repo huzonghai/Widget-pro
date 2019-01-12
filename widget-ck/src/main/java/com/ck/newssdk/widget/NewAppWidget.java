@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
@@ -42,7 +43,7 @@ import static com.ck.newssdk.ui.article.MultipleItemAdapter.THREE_IMG;
 
 
 public class NewAppWidget extends AppWidgetProvider {
-    public static final String TAG = "WIDGET";
+    public static final String TAG = "AA";
     public static final String REFRESH_WIDGET = "refresh_widget";
     public static final String SEARCH_WIDGET = "serach_widget";
     public static final String CARD_WIDGET = "card_widget";
@@ -65,13 +66,15 @@ public class NewAppWidget extends AppWidgetProvider {
     private static ComponentName componentName;
     private static List<ArticleListBean> articleListBeanList;
 
+    private NewAppWidget mNewAppWidget;
+    private IntentFilter intentFilter;
+
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-
                 case GETRECOMMEND_SUCCESS:
 
                     //设置数据
@@ -134,22 +137,22 @@ public class NewAppWidget extends AppWidgetProvider {
                 SPUtils.getCbStateWeather(mContext) == true
                         ? View.VISIBLE : View.GONE);
         //搜索
-        Intent serach = new Intent().setAction(SEARCH_WIDGET);
+        Intent serach = new Intent(mContext, NewAppWidget.class).setAction(SEARCH_WIDGET);
         serach.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentser = PendingIntent.getBroadcast(context, 0, serach, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.re_search, pendingIntentser);
         //刷新
-        Intent refresh = new Intent().setAction(REFRESH_WIDGET);
+        Intent refresh = new Intent(mContext, NewAppWidget.class).setAction(REFRESH_WIDGET);
         refresh.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentre = PendingIntent.getBroadcast(context, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.progress_bar_static, pendingIntentre);
         //加载更多资讯
-        Intent loadnews = new Intent().setAction(LOAD_MORE_NEWS_WIDGET);
+        Intent loadnews = new Intent(mContext, NewAppWidget.class).setAction(LOAD_MORE_NEWS_WIDGET);
         loadnews.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentload = PendingIntent.getBroadcast(context, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
         //卡片管理
-        Intent card = new Intent().setAction(CARD_WIDGET);
+        Intent card = new Intent(mContext, NewAppWidget.class).setAction(CARD_WIDGET);
         card.setComponent(new ComponentName(context, NewAppWidget.class));
         PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
@@ -168,11 +171,47 @@ public class NewAppWidget extends AppWidgetProvider {
         mContext.startActivity(intent);
     }
 
+    private void updateAppWidgetView() {
+
+        componentName = new ComponentName(mContext, NewAppWidget.class);
+        //搜索
+        Intent serach = new Intent(mContext, NewAppWidget.class).setAction(SEARCH_WIDGET);
+        serach.setComponent(componentName);
+        PendingIntent pendingIntentser = PendingIntent.getBroadcast(mContext, 0, serach, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.re_search, pendingIntentser);
+        //刷新
+        Intent refresh = new Intent(mContext, NewAppWidget.class).setAction(REFRESH_WIDGET);
+        refresh.setComponent(componentName);
+        PendingIntent pendingIntentre = PendingIntent.getBroadcast(mContext, 0, refresh, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.progress_bar_static, pendingIntentre);
+        //加载更多资讯
+        Intent loadnews = new Intent(mContext, NewAppWidget.class).setAction(LOAD_MORE_NEWS_WIDGET);
+        loadnews.setComponent(componentName);
+        PendingIntent pendingIntentload = PendingIntent.getBroadcast(mContext, 0, loadnews, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_more, pendingIntentload);
+        //卡片管理
+        Intent card = new Intent(mContext, NewAppWidget.class).setAction(CARD_WIDGET);
+        card.setComponent(componentName);
+        PendingIntent pendingIntentcard = PendingIntent.getBroadcast(mContext, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
+
+        appWidgetManager = AppWidgetManager.getInstance(mContext);
+        appWidgetManager.updateAppWidget(componentName, remoteViews);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
         String action = intent.getAction();
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+        updateAppWidgetView();
+        remoteViews.setViewVisibility(R.id.re_search,
+                SPUtils.getCbStateSearch(mContext) == true
+                        ? View.VISIBLE : View.GONE);
+        remoteViews.setViewVisibility(R.id.re_weather,
+                SPUtils.getCbStateWeather(mContext) == true
+                        ? View.VISIBLE : View.GONE);
+
         if (action.equals(COLLECTION_VIEW_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int index = intent.getIntExtra(COLLECTION_VIEW_EXTRA, 0);
@@ -183,8 +222,8 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
             //launcher:packageName="com.ssui.launcher3"
 //            launcher:className="com.ck.newssdk.widget.NewAppWidget"
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -196,14 +235,14 @@ public class NewAppWidget extends AppWidgetProvider {
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -214,17 +253,11 @@ public class NewAppWidget extends AppWidgetProvider {
                 remoteViews.setViewVisibility(R.id.re_weather,
                         intent.getBooleanExtra("isCheckWeather", true) == true
                                 ? View.VISIBLE : View.GONE);
-                appWidgetManager = AppWidgetManager.getInstance(context);
-                componentName = new ComponentName(context, NewAppWidget.class);
-                appWidgetManager.updateAppWidget(componentName, remoteViews);
             }
         } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-            //main_no_net_weather
-            //main_no_net
             if (IOTil.isNetworkConnected(mContext)) {
                 if (articleListBeanList == null) {
                     loadingData();
-                } else {
                     remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
                     remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
                 }
@@ -233,17 +266,32 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
                     remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
                 }
-
             }
-            appWidgetManager = AppWidgetManager.getInstance(context);
-            componentName = new ComponentName(context, NewAppWidget.class);
-            appWidgetManager.updateAppWidget(componentName, remoteViews);
+        } else if (action.equals("android.intent.action.PACKAGE_DATA_CLEARED")) {
+            Toast.makeText(mContext, "监听到清理数据了", Toast.LENGTH_SHORT).show();
+            System.out.println("AA监听到清理数据了");
+        } else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
+            System.out.println("AA开机广播");
+            updateAppWidgetView();
+            Iml.initIml(mContext);
+            //初始化列表数据
+            initListViewData();
+            //天气
+            initWeatherData();
         }
+
+        appWidgetManager = AppWidgetManager.getInstance(context);
+        componentName = new ComponentName(context, NewAppWidget.class);
+        appWidgetManager.updateAppWidget(componentName, remoteViews);
 
         Log.i(TAG, "onReceive: 执行");
         Iml.initIml(mContext);
+
+        statrService();
+
         super.onReceive(context, intent);
     }
+
 
     private void loadingData() {
         initListViewData();
@@ -267,12 +315,45 @@ public class NewAppWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             Log.i(TAG, "onUpdate: 执行");
         }
+
+        statrService();
     }
 
     @Override
     public void onEnabled(Context context) {
         mContext = context;
+        statrService();
+        initReceiver();
         Iml.initIml(mContext);
+        initSearAndWeather();
+    }
+
+    private void initReceiver() {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        intentFilter.addAction("android.intent.action.PACKAGE_DATA_CLEARED");
+        mNewAppWidget = new NewAppWidget();
+        mContext.getApplicationContext().registerReceiver(mNewAppWidget, intentFilter);
+    }
+
+    private void statrService() {
+        Intent intent = new Intent();
+        intent.setClass(mContext, LiveService.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startService(intent);
+    }
+
+    private void initSearAndWeather() {
+        remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
+        remoteViews.setViewVisibility(R.id.re_search,
+                SPUtils.getCbStateSearch(mContext) == true
+                        ? View.VISIBLE : View.GONE);
+        remoteViews.setViewVisibility(R.id.re_weather,
+                SPUtils.getCbStateWeather(mContext) == true
+                        ? View.VISIBLE : View.GONE);
+        appWidgetManager = AppWidgetManager.getInstance(mContext);
+        componentName = new ComponentName(mContext, NewAppWidget.class);
+        appWidgetManager.updateAppWidget(componentName, remoteViews);
     }
 
     private void initWeatherData() {
@@ -326,6 +407,7 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         Log.i(TAG, "onDisabled: 执行");
+        mContext.unregisterReceiver(mNewAppWidget);
     }
 
     /**

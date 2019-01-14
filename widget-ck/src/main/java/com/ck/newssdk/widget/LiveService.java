@@ -4,15 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.infec.undip.GuardHelper;
-
 
 public class LiveService extends Service {
     private NewAppWidget mNewAppWidget;
 
     @Override
     public void onCreate() {
-        GuardHelper.startDaemon(LiveService.this.getApplicationContext(), LiveService.class.getName());
+//        GuardHelper.startDaemon(LiveService.this.getApplicationContext(), LiveService.class.getName());
         mNewAppWidget = new NewAppWidget();
         Intent intent = new Intent();
         intent.setAction("android.intent.action.BOOT_COMPLETED");

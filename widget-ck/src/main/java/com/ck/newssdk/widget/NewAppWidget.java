@@ -222,8 +222,8 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
             //launcher:packageName="com.ssui.launcher3"
 //            launcher:className="com.ck.newssdk.widget.NewAppWidget"
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -235,14 +235,14 @@ public class NewAppWidget extends AppWidgetProvider {
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -268,7 +268,6 @@ public class NewAppWidget extends AppWidgetProvider {
                 }
             }
         } else if (action.equals("android.intent.action.PACKAGE_DATA_CLEARED")) {
-            Toast.makeText(mContext, "监听到清理数据了", Toast.LENGTH_SHORT).show();
             System.out.println("AA监听到清理数据了");
         } else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
             System.out.println("AA开机广播");

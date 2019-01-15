@@ -21,4 +21,12 @@ public class SPUtils {
         return SharedPrefrencesUtil.getData(context, "XDKP", "cbw", true);
     }
 
+    public static void saveListData(Context context, String jsonArrayStr) {
+        SharedPrefrencesUtil.saveData(context, "XDKP", "jsonArrayStr", jsonArrayStr);
+    }
+
+    public static String getListData(Context context) {
+        return SharedPrefrencesUtil.getData(context, "XDKP", "jsonArrayStr", "");
+    }
+
 }

@@ -66,8 +66,6 @@ public class NewAppWidget extends AppWidgetProvider {
     private static ComponentName componentName;
     private static List<ArticleListBean> articleListBeanList;
 
-    private NewAppWidget mNewAppWidget;
-    private IntentFilter intentFilter;
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -222,8 +220,8 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
             //launcher:packageName="com.ssui.launcher3"
 //            launcher:className="com.ck.newssdk.widget.NewAppWidget"
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -235,14 +233,14 @@ public class NewAppWidget extends AppWidgetProvider {
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
 
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -267,10 +265,16 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
                 }
             }
-        } else if (action.equals("android.intent.action.PACKAGE_DATA_CLEARED")) {
-            System.out.println("AA监听到清理数据了");
         } else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
             System.out.println("AA开机广播");
+            updateAppWidgetView();
+            Iml.initIml(mContext);
+            //初始化列表数据从缓存
+            initListViewDataFromLoca();
+            //天气
+            initWeatherData();
+        } else if (action.equals("ck.widget.action.PACKAGE_DATA_CLEARED")) {
+            System.out.println("AA监听到清理数据了");
             updateAppWidgetView();
             Iml.initIml(mContext);
             //初始化列表数据
@@ -289,6 +293,24 @@ public class NewAppWidget extends AppWidgetProvider {
         statrService();
 
         super.onReceive(context, intent);
+    }
+
+
+    private void initListViewDataFromLoca() {
+        String listData = SPUtils.getListData(mContext);
+        if (!TextUtils.isEmpty(listData)) {
+            ArrayList<ArticleListBean> list = JsonUtil.parseArray(listData, ArticleListBean.class);
+            List<ArticleListBean> articleListBeans = handleData(list);
+            Message message = mHandler.obtainMessage();
+            message.what = GETRECOMMEND_SUCCESS;
+            message.obj = articleListBeans;
+            mHandler.sendMessage(message);
+        } else {
+            Message message = mHandler.obtainMessage();
+            message.what = GETRECOMMEND_FAIL;
+            mHandler.sendMessage(message);
+        }
+
     }
 
 
@@ -314,7 +336,6 @@ public class NewAppWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             Log.i(TAG, "onUpdate: 执行");
         }
-
         statrService();
     }
 
@@ -322,17 +343,26 @@ public class NewAppWidget extends AppWidgetProvider {
     public void onEnabled(Context context) {
         mContext = context;
         statrService();
-        initReceiver();
+//        initReceiver();
         Iml.initIml(mContext);
         initSearAndWeather();
     }
 
-    private void initReceiver() {
-        intentFilter = new IntentFilter();
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        intentFilter.addAction("android.intent.action.PACKAGE_DATA_CLEARED");
-        mNewAppWidget = new NewAppWidget();
-        mContext.getApplicationContext().registerReceiver(mNewAppWidget, intentFilter);
+    private NewAppWidget mNewAppWidget;
+    private IntentFilter intentFilter;
+
+//    private void initReceiver() {
+//        intentFilter = new IntentFilter();
+//        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+//        intentFilter.addAction("android.intent.action.PACKAGE_DATA_CLEARED");
+//        mNewAppWidget = new NewAppWidget();
+//        mContext.getApplicationContext().registerReceiver(mNewAppWidget, intentFilter);
+//    }
+
+    @Override
+    public void onDisabled(Context context) {
+        Log.i(TAG, "onDisabled: 执行");
+//        mContext.unregisterReceiver(mNewAppWidget);
     }
 
     private void statrService() {
@@ -403,11 +433,6 @@ public class NewAppWidget extends AppWidgetProvider {
         }
     }
 
-    @Override
-    public void onDisabled(Context context) {
-        Log.i(TAG, "onDisabled: 执行");
-        mContext.unregisterReceiver(mNewAppWidget);
-    }
 
     /**
      * 初始化数据
@@ -435,7 +460,8 @@ public class NewAppWidget extends AppWidgetProvider {
                     public void onSuccess(String data) {
                         try {
                             JSONObject obj = new JSONObject(data);
-                            JSONArray jsonArray = (JSONArray) obj.get("articles");
+                            JSONArray jsonArray = obj.optJSONArray("articles");
+                            SPUtils.saveListData(mContext, jsonArray.toString());
                             ArrayList<ArticleListBean> list = JsonUtil.parseArray(jsonArray.toString(), ArticleListBean.class);
                             List<ArticleListBean> articleListBeans = handleData(list);
                             Message message = mHandler.obtainMessage();

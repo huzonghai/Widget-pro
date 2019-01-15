@@ -1,9 +1,9 @@
 package com.ck.newssdk.widget;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 
 import com.ck.newssdk.R;
 
-public class CardManageAct extends AppCompatActivity implements View.OnClickListener {
+public class CardManageAct extends Activity implements View.OnClickListener {
     private CheckBox mCheckBoxSearck, mCheckBoxWeather;
     private LinearLayout mLinearLayout;
     public static final String CARD_FORM_ACT = "card_for_act";
@@ -25,7 +25,6 @@ public class CardManageAct extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

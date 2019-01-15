@@ -20,11 +20,14 @@
         <activity
             android:name=".widget.CardManageAct"
             android:excludeFromRecents="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+          />
         <activity
             android:name=".widget.SearchAct"
             android:excludeFromRecents="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:name=".ui.CkActivity"
             android:excludeFromRecents="true"

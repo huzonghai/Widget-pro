@@ -20,21 +20,26 @@
         <activity
             android:name=".widget.CardManageAct"
             android:excludeFromRecents="true"
+            android:process=":ck.widget"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-          />
+            />
         <activity
             android:name=".widget.SearchAct"
             android:excludeFromRecents="true"
+            android:process=":ck.widget"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:name=".ui.CkActivity"
             android:excludeFromRecents="true"
+            android:process=":ck.widget"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
-        <receiver android:name=".widget.NewAppWidget">
+        <receiver
+            android:name=".widget.NewAppWidget"
+            android:process=":ck.widget">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.PACKAGE_DATA_CLEARED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -57,12 +62,14 @@
 
         <service
             android:name=".widget.ListWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:process=":ck.widget"/>
 
         <activity
             android:name=".ui.web.WebActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
+            android:process=":ck.widget"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
@@ -73,7 +80,8 @@
         <service
             android:name=".widget.LiveService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:process=":ck.widget">
         </service>
 
 

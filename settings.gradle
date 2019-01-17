@@ -1,1 +1,1 @@
-include ':app', ':widget-ck', ':netlib'
+include ':app', ':widget-ck'

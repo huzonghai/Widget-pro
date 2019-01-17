@@ -43,6 +43,14 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE_OPTIONS"/>
+                <action android:name="android.appwidget.action.APPWIDGET_DELETED"/>
+                <action android:name="android.appwidget.action.APPWIDGET_DISABLED"/>
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED"/>
+                <action android:name="android.appwidget.action.APPWIDGET_HOST_RESTORED"/>
+                <action android:name="android.appwidget.action.APPWIDGET_RESTORED"/>
+
                 <action android:name="collection_view_action"/>
                 <action android:name="refresh_widget"/>
                 <action android:name="serach_widget"/>
@@ -70,8 +78,6 @@
         <meta-data
             android:name="CHANNEL"
             android:value="999"/>
-
-
 
 
     </application>

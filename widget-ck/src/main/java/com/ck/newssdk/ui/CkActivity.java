@@ -21,6 +21,7 @@ public class CkActivity extends BaseActivity implements CkView.View {
         super.onCreate(savedInstanceState);
         presenter = new CkPresenter(this);
         presenter.getTopics(this, Configuration.CurrentCountry);
+
     }
 
     @Override
@@ -35,7 +36,6 @@ public class CkActivity extends BaseActivity implements CkView.View {
             }
 
             initNavigator();
-
         }
     }
 

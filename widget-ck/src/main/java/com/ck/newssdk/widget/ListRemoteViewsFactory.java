@@ -1,7 +1,6 @@
 package com.ck.newssdk.widget;
 
 import android.annotation.SuppressLint;
-import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -57,7 +56,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
      */
     public ListRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+//        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 
     }
 
@@ -104,37 +103,6 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 break;
             default:
         }
-
-
-//        if (mArticleListBeanList != null) {
-//            for (int i = 0; i < mArticleListBeanList.size(); i++) {
-//                num = i;
-//                if (mArticleListBeanList.get(num).getItemType() == 3) {
-//                    System.out.println("ListTitlepic---> " + mArticleListBeanList.get(num).getTitlepic());
-//                    ExecutorServiceUtils.getInstance(mContext).pushRunnable(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Bitmap bitmap = Download.downloadToBitmap(mArticleListBeanList.get(num).getTitlepic());
-//                            if (bitmap != null) {
-//                                Message message = mHandler.obtainMessage();
-//                                message.what = SUCCESS;
-//                                NewBean newBean = new NewBean(bitmap, mArticleListBeanList.get(num).getTitle());
-//                                message.obj = newBean;
-//                                mHandler.sendMessageAtTime(message, 500);
-//                            }
-//
-//                        }
-//                    });
-//                }
-//            }
-//        }
-
-//        bitmap = Download.downloadToBitmap("http://cdn.img.coolook.org/2019-01-07/bcba7dedbb909fd8664a4cdedbb2fd3c.jpg!240");
-//        Message message = mHandler.obtainMessage();
-//        message.what = SUCCESS;
-//        mHandler.sendMessage(message);
-//        mHandler.sendMessageAtTime(message, 500);
-
 
         Intent fillInIntent = new Intent();
         fillInIntent.putExtra("Type", 0);

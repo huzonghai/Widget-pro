@@ -1,9 +1,10 @@
 package com.ck.newssdk.widget;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -14,7 +15,7 @@ import android.widget.LinearLayout;
 
 import com.ck.newssdk.R;
 
-public class CardManageAct extends Activity implements View.OnClickListener {
+public class CardManageAct extends AppCompatActivity implements View.OnClickListener {
     private CheckBox mCheckBoxSearck, mCheckBoxWeather;
     private LinearLayout mLinearLayout;
     public static final String CARD_FORM_ACT = "card_for_act";
@@ -46,20 +47,16 @@ public class CardManageAct extends Activity implements View.OnClickListener {
 
         mCheckBoxSearck.setChecked(isCheckSearch);
         mCheckBoxWeather.setChecked(isCheckWeather);
-        System.out.println("AA-CardManageAct-CbStateSearch--> " + SPUtils.getCbStateSearch(this));
-        System.out.println("AA-CardManageAct-CbStateWeather--> " + SPUtils.getCbStateWeather(this));
         mCheckBoxSearck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
                 isCheckSearch = isCheck;
-                System.out.println("AA-CardManageAct.点击了Searck-->" + isCheck);
             }
         });
         mCheckBoxWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
                 isCheckWeather = isCheck;
-                System.out.println("AA-CardManageAct.点击了Weather-->" + isCheck);
 
             }
         });
@@ -88,10 +85,22 @@ public class CardManageAct extends Activity implements View.OnClickListener {
         }
     }
 
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        doCallback();
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            doCallback();
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
+            doCallback();
+        } else if (keyCode == KeyEvent.KEYCODE_HOME) {
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    protected void onUserLeaveHint() {
+        doCallback();
+        super.onUserLeaveHint();
+    }
 }

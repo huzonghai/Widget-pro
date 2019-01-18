@@ -52,7 +52,6 @@
             android:layout_marginBottom="17dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="17dp"
-            android:src="@mipmap/weather_ic"
             />
         <!--android:src="@mipmap/weather_ic"-->
 
@@ -118,6 +117,15 @@
         android:layout_below="@+id/re_search"
         android:layout_marginTop="10dp"
         android:visibility="gone"
+        />
+
+    <include
+        android:id="@+id/loading_weather_layout"
+        layout="@layout/loading_weather"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/re_search"
+        android:layout_marginTop="10dp"
         />
 
     <RelativeLayout
@@ -205,6 +213,15 @@
             android:layout_above="@+id/tv_more"
             android:layout_below="@+id/re_refresh"
             android:visibility="gone"
+            />
+
+        <include
+            android:id="@+id/loading_text_layout"
+            layout="@layout/loading_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tv_more"
+            android:layout_below="@+id/re_refresh"
             />
 
         <ProgressBar

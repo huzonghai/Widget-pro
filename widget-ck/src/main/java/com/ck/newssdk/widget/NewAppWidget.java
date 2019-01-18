@@ -90,6 +90,7 @@ public class NewAppWidget extends AppWidgetProvider {
                     componentName = new ComponentName(mContext, NewAppWidget.class);
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+                    remoteViews.setViewVisibility(R.id.loading_text_layout, View.GONE);
                     if (isRefresh) {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
                         hideLoading(mContext);
@@ -102,6 +103,8 @@ public class NewAppWidget extends AppWidgetProvider {
                     listIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
+
+                    updateAppWidgetView();
                     appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
                     break;
                 case GETRECOMMEND_FAIL:
@@ -113,6 +116,7 @@ public class NewAppWidget extends AppWidgetProvider {
                     componentName = new ComponentName(mContext, NewAppWidget.class);
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     Weather weather = (Weather) msg.obj;
+                    remoteViews.setViewVisibility(R.id.loading_weather_layout, View.GONE);
                     remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
@@ -165,7 +169,7 @@ public class NewAppWidget extends AppWidgetProvider {
         mContext.startActivity(intent);
     }
 
-    private void updateAppWidgetView() {
+    private static void updateAppWidgetView() {
         componentName = new ComponentName(mContext, NewAppWidget.class);
         //搜索
         Intent serach = new Intent().setAction(SEARCH_WIDGET);
@@ -215,7 +219,7 @@ public class NewAppWidget extends AppWidgetProvider {
 //            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
-            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
             loadingData();
@@ -225,13 +229,13 @@ public class NewAppWidget extends AppWidgetProvider {
             Intent startAcIntent = new Intent();
 //            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
             startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
-            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
 //            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
             startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
-            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
             if (intent != null) {

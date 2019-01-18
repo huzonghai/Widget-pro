@@ -9,6 +9,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -120,7 +121,7 @@ public class DeviceUtils {
 
     public static String getUUID(Context context) {
         String uuid = SharePDataBaseUtils.getUUID(context);
-        if (StringUtils.isEmpty(uuid)) {
+        if (TextUtils.isEmpty(uuid)) {
             uuid = MD5.MD5(UUID.randomUUID().toString());
             SharePDataBaseUtils.saveUUID(context, uuid);
         }

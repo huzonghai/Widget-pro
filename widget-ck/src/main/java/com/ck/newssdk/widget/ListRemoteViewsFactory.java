@@ -142,13 +142,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     }
 
-    public static void refresh(Context context) {
-        mContext = context;
-        if (mArticleListBeanList != null) {
-            mArticleListBeanList.clear();
-        }
-        initListViewData();
-    }
+
 
     @Override
     public int getCount() {

@@ -34,7 +34,6 @@ public class CkActivity extends BaseActivity implements CkView.View {
                     fragments.add(CkFragment.newInstance(topicid));
                 }
             }
-
             initNavigator();
         }
     }
@@ -55,14 +54,14 @@ public class CkActivity extends BaseActivity implements CkView.View {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter = null;
+//        presenter = null;
         if (fragments != null) {
             fragments.clear();
-            fragments = null;
+//            fragments = null;
         }
         if (topics != null) {
             topics.clear();
-            topics = null;
+//            topics = null;
         }
     }
 }

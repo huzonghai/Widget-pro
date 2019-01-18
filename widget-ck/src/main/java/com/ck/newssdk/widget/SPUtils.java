@@ -2,6 +2,8 @@ package com.ck.newssdk.widget;
 
 import android.content.Context;
 
+import com.ck.newssdk.utils.SharedPrefrencesUtil;
+
 
 public class SPUtils {
 

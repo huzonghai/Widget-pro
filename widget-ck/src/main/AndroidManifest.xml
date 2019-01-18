@@ -17,6 +17,10 @@
         tools:ignore="ProtectedPermissions"/>
 
     <application>
+
+        <meta-data
+            android:name="CHANNEL"
+            android:value="999"/>
         <activity
             android:name=".widget.CardManageAct"
             android:excludeFromRecents="true"
@@ -31,6 +35,13 @@
         <activity
             android:name=".ui.CkActivity"
             android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+        <activity
+            android:name=".ui.web.WebActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
@@ -61,16 +72,6 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             />
 
-        <activity
-            android:name=".ui.web.WebActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-
-        <meta-data
-            android:name="CHANNEL"
-            android:value="999"/>
 
 
     </application>

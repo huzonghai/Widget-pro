@@ -3,7 +3,7 @@
 
     <item>
         <rotate
-            android:drawable="@mipmap/network_long_pro"
+            android:drawable="@mipmap/loading_text"
             android:fromDegrees="0.0"
             android:pivotX="50.0%"
             android:pivotY="50.0%"

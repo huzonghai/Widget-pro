@@ -99,6 +99,7 @@ public class CardManageAct extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onUserLeaveHint() {
         doCallback();
+        finish();
         super.onUserLeaveHint();
     }
 }

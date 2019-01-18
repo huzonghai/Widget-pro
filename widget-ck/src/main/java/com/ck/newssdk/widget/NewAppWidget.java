@@ -26,6 +26,10 @@ import com.ck.newssdk.utils.DeviceUtils;
 import com.ck.newssdk.utils.Iml;
 import com.ck.newssdk.utils.JsonUtil;
 import com.ck.newssdk.utils.ThreadPoolExecutorUtils;
+import com.ck.newssdk.utils.imload.core.DisplayImageOptions;
+import com.ck.newssdk.utils.imload.core.ImageLoader;
+import com.ck.newssdk.utils.imload.core.assist.ImageScaleType;
+import com.ck.newssdk.utils.imload.core.display.SimpleBitmapDisplayer;
 import com.ck.newssdk.widget.api.HttpJsonTask;
 
 import org.json.JSONArray;
@@ -66,6 +70,12 @@ public class NewAppWidget extends AppWidgetProvider {
     private static ComponentName componentName;
     private static List<ArticleListBean> articleListBeanList;
 
+    public static List<ArticleListBean> getArticListData() {
+        if (articleListBeanList != null) {
+            return articleListBeanList;
+        }
+        return null;
+    }
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -103,12 +113,14 @@ public class NewAppWidget extends AppWidgetProvider {
                     componentName = new ComponentName(mContext, NewAppWidget.class);
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     Weather weather = (Weather) msg.obj;
+                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
                     remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
                     appWidgetManager.updateAppWidget(componentName, remoteViews);
                     break;
                 case WEATHER_FAIL:
+                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
                     break;
                 default:
             }
@@ -152,6 +164,7 @@ public class NewAppWidget extends AppWidgetProvider {
         intent.putExtra("articleid", news.getId());
         mContext.startActivity(intent);
     }
+
     private void updateAppWidgetView() {
         componentName = new ComponentName(mContext, NewAppWidget.class);
         //搜索
@@ -230,9 +243,10 @@ public class NewAppWidget extends AppWidgetProvider {
                                 ? View.VISIBLE : View.GONE);
             }
         } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-            System.out.println("AA 收到来自launcher发来的android.net.conn.CONNECTIVITY_CHANGE");
+            System.out.println("AA android.net.conn.CONNECTIVITY_CHANGE");
             if (IOTil.isNetworkConnected(mContext)) {
                 if (articleListBeanList == null) {
+                    remoteViews.setViewVisibility(R.id.imgv_weather, View.VISIBLE);
                     loadingData();
                     remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
                     remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
@@ -241,20 +255,22 @@ public class NewAppWidget extends AppWidgetProvider {
                 if (articleListBeanList == null) {
                     remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
                     remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
+                    remoteViews.setViewVisibility(R.id.imgv_weather, View.GONE);
                 }
             }
-        } else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
-            System.out.println("AA收到开机广播");
+        } else if (action.equals("android.intent.action.BOOT_COMPLETED")
+                || action.equals("create_widget")) {
+            System.out.println("AA create_widget form launcher");
             updateAppWidgetView();
             Iml.initIml(mContext);
             //初始化列表数据从缓存
             initListViewDataFromLoca();
             initWeatherData();
         } else if (action.equals("ck.widget.action.FORM_LAUNCHER")) {
-            System.out.println("AA 收到来自launcher发来的ck.widget.action");
+            System.out.println("AA ck.widget.action form launcher");
             updateAppWidgetView();
             Iml.initIml(mContext);
-            initListViewData();
+            initListViewDataFromLoca();
             initWeatherData();
         }
         appWidgetManager = AppWidgetManager.getInstance(context);
@@ -275,9 +291,7 @@ public class NewAppWidget extends AppWidgetProvider {
             message.obj = articleListBeans;
             mHandler.sendMessage(message);
         } else {
-            Message message = mHandler.obtainMessage();
-            message.what = GETRECOMMEND_FAIL;
-            mHandler.sendMessage(message);
+            initListViewData();
         }
     }
 
@@ -303,38 +317,33 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         mContext = context;
+        initReceiver();
         Iml.initIml(mContext);
         Log.i(TAG, "onEnabled: 执行");
-        initListViewData();
-        initWeatherData();
-        updateAppWidgetView();
-        initSearAndWeather();
-
+//        initListViewData();
+//        initWeatherData();
+//        initSearAndWeather();
     }
 
     private NewAppWidget mNewAppWidget;
     private IntentFilter intentFilter;
 
-//    private void initReceiver() {
-//        intentFilter = new IntentFilter();
-//        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-//        intentFilter.addAction("android.intent.action.PACKAGE_DATA_CLEARED");
-//        mNewAppWidget = new NewAppWidget();
-//        mContext.getApplicationContext().registerReceiver(mNewAppWidget, intentFilter);
-//    }
+    private void initReceiver() {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        mNewAppWidget = new NewAppWidget();
+        mContext.getApplicationContext().registerReceiver(mNewAppWidget, intentFilter);
+    }
 
     @Override
     public void onDisabled(Context context) {
+        mContext = context;
         Log.i(TAG, "onDisabled: 执行");
-//        mContext.unregisterReceiver(mNewAppWidget);
+        if (mNewAppWidget != null) {
+            mContext.unregisterReceiver(mNewAppWidget);
+        }
     }
 
-//    private void statrService() {
-//        Intent intent = new Intent();
-//        intent.setClass(mContext, LiveService.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startService(intent);
-//    }
 
     private void initSearAndWeather() {
         remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
@@ -349,7 +358,19 @@ public class NewAppWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(componentName, remoteViews);
     }
 
+    private DisplayImageOptions optionsWeather;
+
     private void initWeatherData() {
+        optionsWeather = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.mipmap.weather_ic)
+                .showImageForEmptyUri(R.mipmap.weather_ic)
+                .showImageOnFail(R.mipmap.weather_ic)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new SimpleBitmapDisplayer())
+                .build();
         Executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -362,11 +383,11 @@ public class NewAppWidget extends AppWidgetProvider {
                         for (int i = 0; i < weather.length(); i++) {
                         }
                         JSONObject weatherbean = weather.optJSONObject(0);
-                        Bitmap bitmap = Download.downloadToBitmap(new StringBuilder()
+                        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(new StringBuilder()
                                 .append("https://weathericon.coolook.org/icon/")
                                 .append(weatherbean.optJSONObject("weather").optString("icon"))
                                 .append(".png")
-                                .toString());
+                                .toString(), optionsWeather);
                         Message message = mHandler.obtainMessage();
                         message.what = WEATHER_SUCCESS;
                         Weather weaben = new Weather(bitmap, new StringBuilder()
@@ -376,7 +397,9 @@ public class NewAppWidget extends AppWidgetProvider {
                         message.obj = weaben;
                         mHandler.sendMessage(message);
                     } catch (Exception e) {
-                        ;
+                        Message message = mHandler.obtainMessage();
+                        message.what = WEATHER_FAIL;
+                        mHandler.sendMessage(message);
                     }
                 }
             }
@@ -437,6 +460,7 @@ public class NewAppWidget extends AppWidgetProvider {
                             e.printStackTrace();
                         }
                     }
+
                     @Override
                     public void onFailure(String message) {
                         Message messagefail = mHandler.obtainMessage();
@@ -446,8 +470,6 @@ public class NewAppWidget extends AppWidgetProvider {
                 });
         ThreadPoolExecutorUtils.getInstance().execute(task);
     }
-
-
 
     private static void showLoading(Context context) {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);

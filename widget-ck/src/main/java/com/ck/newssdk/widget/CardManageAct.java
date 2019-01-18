@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -57,7 +56,6 @@ public class CardManageAct extends AppCompatActivity implements View.OnClickList
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
                 isCheckWeather = isCheck;
-
             }
         });
     }

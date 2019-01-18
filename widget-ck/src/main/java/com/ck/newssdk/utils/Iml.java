@@ -23,7 +23,7 @@ import com.ck.newssdk.utils.imload.utils.StorageUtils;
 import java.io.File;
 
 public class Iml {
-    private volatile static DisplayImageOptions options;
+    public volatile static DisplayImageOptions options;
     private final static String[] country = {"us", "br", "ru", "in", "id"};
 
     public Iml() {

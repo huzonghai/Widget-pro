@@ -1,18 +1,20 @@
 package com.ck.newssdk.widget;
 
-import android.annotation.SuppressLint;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.ck.newssdk.R;
 import com.ck.newssdk.beans.ArticleListBean;
+import com.ck.newssdk.utils.imload.core.DisplayImageOptions;
+import com.ck.newssdk.utils.imload.core.ImageLoader;
+import com.ck.newssdk.utils.imload.core.assist.ImageScaleType;
+import com.ck.newssdk.utils.imload.core.display.SimpleBitmapDisplayer;
 
 import java.util.List;
 
@@ -21,84 +23,81 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static String TAG = "RemoteViewsFactory_widget";
     private static Context mContext;
     private static int mAppWidgetId;
-    private static int i;
-
     private static List<ArticleListBean> mArticleListBeanList;
-    private static int num;
-    private final static int SUCCESS = 0;
-    private final static int FAIL = 1;
     private static RemoteViews remoteViews;
-
     public static final int TEXT = 1;
     public static final int IMG = 2;
     public static final int BIG_IMG = 3;
     public static final int THREE_IMG = 4;
-    @SuppressLint("HandlerLeak")
-    private static Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case SUCCESS:
-                    NewBean newBean = (NewBean) msg.obj;
-                    remoteViews.setImageViewBitmap(R.id.imgv_pic, newBean.getBitmap());
-                    remoteViews.setTextViewText(R.id.tv_text, newBean.getTitle());
-                    break;
-                case FAIL:
-                    break;
-                default:
-            }
-        }
-    };
+    private static DisplayImageOptions options;
+
 
     /**
      * 构造ListRemoteViewsFactory
      */
     public ListRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
-//        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-
+        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     public static void setArticleData(List<ArticleListBean> articleListBean) {
         mArticleListBeanList = articleListBean;
-
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.mipmap.placeholder_figure)
+                .showImageForEmptyUri(R.mipmap.placeholder_figure)
+                .showImageOnFail(R.mipmap.placeholder_figure)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new SimpleBitmapDisplayer())
+                .build();
     }
 
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate");
-        initListViewData();
+//        initListViewData();
     }
 
     /**
      * 初始化数据
      */
     private static void initListViewData() {
+        mArticleListBeanList = NewAppWidget.getArticListData();
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.mipmap.placeholder_figure)
+                .showImageForEmptyUri(R.mipmap.placeholder_figure)
+                .showImageOnFail(R.mipmap.placeholder_figure)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .displayer(new SimpleBitmapDisplayer())
+                .build();
     }
 
 
     @Override
     public RemoteViews getViewAt(int position) {
-
         ArticleListBean articleListBean = mArticleListBeanList.get(position);
         int itemType = articleListBean.getItemType();
         switch (itemType) {
             case IMG:
                 remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item0_new_app_widget);
-                remoteViews.setImageViewBitmap(R.id.imgv_pic, Download.downloadToBitmap(articleListBean.getImgs()[0]));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic, ImageLoader.getInstance().loadImageSync(articleListBean.getImgs()[0], options));
                 remoteViews.setTextViewText(R.id.tv_text, articleListBean.getTitle());
                 break;
             case BIG_IMG:
                 remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item1_new_app_widget);
-                remoteViews.setImageViewBitmap(R.id.imgv_pic_1, Download.downloadToBitmap(articleListBean.getImgs()[0]));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_1, ImageLoader.getInstance().loadImageSync(articleListBean.getImgs()[0], options));
                 remoteViews.setTextViewText(R.id.tv_text_1, articleListBean.getTitle());
                 break;
             case THREE_IMG:
                 remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item2_new_app_widget);
-                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_0, Download.downloadToBitmap(articleListBean.getImgs()[0]));
-                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_1, Download.downloadToBitmap(articleListBean.getImgs()[1]));
-                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_2, Download.downloadToBitmap(articleListBean.getImgs()[2]));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_0, ImageLoader.getInstance().loadImageSync(articleListBean.getImgs()[0], options));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_1, ImageLoader.getInstance().loadImageSync(articleListBean.getImgs()[1], options));
+                remoteViews.setImageViewBitmap(R.id.imgv_pic_2_2, ImageLoader.getInstance().loadImageSync(articleListBean.getImgs()[2], options));
                 remoteViews.setTextViewText(R.id.tv_text_2, articleListBean.getTitle());
                 break;
             default:
@@ -108,7 +107,9 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         fillInIntent.putExtra("Type", 0);
         fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_EXTRA, position);
         fillInIntent.putExtra(NewAppWidget.COLLECTION_VIEW_BEAN_EXTRA, articleListBean);
-        fillInIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
+        fillInIntent.setComponent(new
+
+                ComponentName(mContext, NewAppWidget.class));
         remoteViews.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
 
         return remoteViews;
@@ -138,6 +139,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         public void setTitle(String title) {
             this.title = title;
         }
+
     }
 
     public static void refresh(Context context) {

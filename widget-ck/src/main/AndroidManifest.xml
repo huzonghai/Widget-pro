@@ -23,12 +23,14 @@
             android:value="999"/>
         <activity
             android:name=".widget.CardManageAct"
+            android:launchMode="singleTask"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             />
         <activity
             android:name=".widget.SearchAct"
+            android:launchMode="singleTask"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>

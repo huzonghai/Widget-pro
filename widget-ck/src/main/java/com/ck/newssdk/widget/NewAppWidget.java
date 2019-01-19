@@ -65,10 +65,13 @@ public class NewAppWidget extends AppWidgetProvider {
     private final static int WEATHER_SUCCESS = 5;
     private final static int WEATHER_FAIL = 6;
     private static boolean isRefresh = false;
+    private static boolean isBOOT = false;
+
     private static RemoteViews remoteViews;
     private static AppWidgetManager appWidgetManager;
     private static ComponentName componentName;
     private static List<ArticleListBean> articleListBeanList;
+    private static long bootAction;
 
     public static List<ArticleListBean> getArticListData() {
         if (articleListBeanList != null) {
@@ -90,7 +93,9 @@ public class NewAppWidget extends AppWidgetProvider {
                     componentName = new ComponentName(mContext, NewAppWidget.class);
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
-                    remoteViews.setViewVisibility(R.id.loading_text_layout, View.GONE);
+
+                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+
                     if (isRefresh) {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
                         hideLoading(mContext);
@@ -103,28 +108,32 @@ public class NewAppWidget extends AppWidgetProvider {
                     listIntent.setComponent(new ComponentName(mContext, NewAppWidget.class));
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, listIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
-
+                    long end = System.currentTimeMillis();
+                    long time = end - bootAction;
+                    System.out.println("AA Boot---getData  --时间间隔 ->" + time);
                     updateAppWidgetView();
                     appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
                     break;
                 case GETRECOMMEND_FAIL:
                     hideLoading(mContext);
-                    Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT).show();
+                    if (isBOOT) {
+                        Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case WEATHER_SUCCESS:
                     appWidgetManager = AppWidgetManager.getInstance(mContext);
                     componentName = new ComponentName(mContext, NewAppWidget.class);
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     Weather weather = (Weather) msg.obj;
-                    remoteViews.setViewVisibility(R.id.loading_weather_layout, View.GONE);
-                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
+
+                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
                     remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
                     appWidgetManager.updateAppWidget(componentName, remoteViews);
                     break;
                 case WEATHER_FAIL:
-                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
                     break;
                 default:
             }
@@ -222,6 +231,7 @@ public class NewAppWidget extends AppWidgetProvider {
 //            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(REFRESH_WIDGET)) {
+            isBOOT = true;
             loadingData();
         } else if (action.equals(LOAD_MORE_NEWS_WIDGET)) {
             String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
@@ -248,22 +258,19 @@ public class NewAppWidget extends AppWidgetProvider {
             }
         } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
             System.out.println("AA android.net.conn.CONNECTIVITY_CHANGE");
-            if (IOTil.isNetworkConnected(mContext)) {
-                if (articleListBeanList == null) {
-                    remoteViews.setViewVisibility(R.id.imgv_weather, View.VISIBLE);
-                    loadingData();
-                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.GONE);
-                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
-                }
-            } else {
-                if (articleListBeanList == null) {
-                    remoteViews.setViewVisibility(R.id.main_no_net_weather, View.VISIBLE);
-                    remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
-                    remoteViews.setViewVisibility(R.id.imgv_weather, View.GONE);
-                }
-            }
+//            if (IOTil.isNetworkConnected(mContext)) {
+//                if (articleListBeanList == null) {
+//                    loadingData();
+//                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+//                }
+//            } else {
+//                if (articleListBeanList == null) {
+//                    remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
+//                }
+//            }
         } else if (action.equals("android.intent.action.BOOT_COMPLETED")
                 || action.equals("create_widget")) {
+            bootAction = System.currentTimeMillis();
             System.out.println("AA create_widget form launcher");
             updateAppWidgetView();
             Iml.initIml(mContext);
@@ -276,6 +283,13 @@ public class NewAppWidget extends AppWidgetProvider {
             Iml.initIml(mContext);
             initListViewDataFromLoca();
             initWeatherData();
+        }
+        if (!IOTil.isNetworkConnected(mContext)) {
+            if (articleListBeanList == null) {
+                remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
+            }
+        } else {
+            remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
         }
         appWidgetManager = AppWidgetManager.getInstance(context);
         componentName = new ComponentName(context, NewAppWidget.class);

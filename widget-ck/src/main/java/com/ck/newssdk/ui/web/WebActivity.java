@@ -138,10 +138,10 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
                         mSelectUrl.setChecked(false);
                         isOraginFinish = false;
                     } else {
+                        webWebViewOragin.setVisibility(View.GONE);
                         scroll();
                         mSelectUrl.setChecked(true);
                         webWebViewCoolook.setVisibility(View.VISIBLE);
-                        webWebViewOragin.setVisibility(View.GONE);
                     }
                     isCoolook = false;
                 }
@@ -153,11 +153,12 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
             @Override
             public void onWebProgressDismiss() {
                 isQuick = true;
+                webWebViewOragin.setVisibility(View.GONE);
+
                 adLayout.setVisibility(View.VISIBLE);
                 webRelatedLayout.setVisibility(View.VISIBLE);
 
                 webWebViewCoolook.setVisibility(View.VISIBLE);
-                webWebViewOragin.setVisibility(View.GONE);
 
                 if (isBrowseMode && oraginURL != null) {
                     webWebViewOragin.loadUrl(oraginURL);
@@ -172,13 +173,14 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
                 super.onPageFinished(view, url);
                 isOraginFinish = true;
                 if (isCoolook) {
+                    webWebViewOragin.setVisibility(View.VISIBLE);
+
                     scroll();
                     mSelectUrl.setChecked(false);
                     adLayout.setVisibility(View.GONE);
                     webRelatedLayout.setVisibility(View.GONE);
 
                     webWebViewCoolook.setVisibility(View.GONE);
-                    webWebViewOragin.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -193,10 +195,10 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
             }
         }
         if (isBrowseMode) {
+            webWebViewOragin.setVisibility(View.GONE);
             scroll();
             mSelectUrl.setChecked(true);
             webWebViewCoolook.setVisibility(View.VISIBLE);
-            webWebViewOragin.setVisibility(View.GONE);
             webQuickBorwsingBtn.setChecked(true);
             isQuick = true;
         }
@@ -229,10 +231,11 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
 
     private void changeView(boolean isChecked) {
         if (isChecked) {
+            webWebViewOragin.setVisibility(View.GONE);
+
             scroll();
             mSelectUrl.setChecked(true);
             webWebViewCoolook.setVisibility(View.VISIBLE);
-            webWebViewOragin.setVisibility(View.GONE);
             webQuickBorwsingBtn.setChecked(true);
             if (isQuick) {
                 adLayout.setVisibility(View.VISIBLE);
@@ -494,6 +497,12 @@ public class WebActivity extends BaseWebActivity implements WebDialog.OnWebDialo
 //    public void onWebSelectDialogMiss() {
 //        webSelectBrowsingMode.setChecked(true);
 //    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        finish();
+        super.onUserLeaveHint();
+    }
 
     @Override
     protected void onDestroy() {

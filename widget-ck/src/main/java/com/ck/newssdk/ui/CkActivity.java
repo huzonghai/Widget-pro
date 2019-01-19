@@ -52,6 +52,12 @@ public class CkActivity extends BaseActivity implements CkView.View {
     }
 
     @Override
+    protected void onUserLeaveHint() {
+        finish();
+        super.onUserLeaveHint();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 //        presenter = null;

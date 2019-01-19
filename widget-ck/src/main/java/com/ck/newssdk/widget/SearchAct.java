@@ -84,6 +84,11 @@ public class SearchAct extends Activity {
     }
 
     @Override
+    protected void onUserLeaveHint() {
+        finish();
+        super.onUserLeaveHint();
+    }
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mWebView != null) {

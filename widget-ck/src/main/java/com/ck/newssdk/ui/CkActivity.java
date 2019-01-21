@@ -2,6 +2,7 @@ package com.ck.newssdk.ui;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
@@ -44,7 +45,9 @@ public class CkActivity extends BaseActivity implements CkView.View {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplication(), "Please check your network and Retry !", Toast.LENGTH_SHORT).show();
+                Toast toast = Toast.makeText(getApplication(), "Please check your network and Retry !", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
                 noNet.setVisibility(View.VISIBLE);
                 loading.setVisibility(View.GONE);
             }

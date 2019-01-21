@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -117,8 +118,12 @@ public class NewAppWidget extends AppWidgetProvider {
                 case GETRECOMMEND_FAIL:
                     hideLoading(mContext);
                     if (isBOOT) {
-                        Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT).show();
+                        Toast toast = Toast.makeText(mContext, "Refresh requires network", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                        isBOOT = false;
                     }
+                    updateAppWidgetView();
                     break;
                 case WEATHER_SUCCESS:
                     appWidgetManager = AppWidgetManager.getInstance(mContext);
@@ -127,13 +132,15 @@ public class NewAppWidget extends AppWidgetProvider {
                     Weather weather = (Weather) msg.obj;
 
                     remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
-
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
                     remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
+
+                    updateAppWidgetView();
                     appWidgetManager.updateAppWidget(componentName, remoteViews);
                     break;
                 case WEATHER_FAIL:
+                    updateAppWidgetView();
                     break;
                 default:
             }
@@ -314,11 +321,28 @@ public class NewAppWidget extends AppWidgetProvider {
     }
 
     private void loadingData() {
-        initListViewData();
-        initWeatherData();
         isRefresh = true;
         showLoading(mContext);
+        if (!IOTil.isNetworkConnected(mContext)) {
+            mHandler.postDelayed(mRunnable, 2000);
+            return;
+        }
+
+        initListViewData();
+        initWeatherData();
+
     }
+
+    Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            hideLoading(mContext);
+            Toast toast = Toast.makeText(mContext, "Please check your network and Retry!", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            isRefresh = false;
+        }
+    };
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -362,19 +386,6 @@ public class NewAppWidget extends AppWidgetProvider {
         }
     }
 
-
-    private void initSearAndWeather() {
-        remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
-        remoteViews.setViewVisibility(R.id.re_search,
-                SPUtils.getCbStateSearch(mContext) == true
-                        ? View.VISIBLE : View.GONE);
-        remoteViews.setViewVisibility(R.id.re_weather,
-                SPUtils.getCbStateWeather(mContext) == true
-                        ? View.VISIBLE : View.GONE);
-        appWidgetManager = AppWidgetManager.getInstance(mContext);
-        componentName = new ComponentName(mContext, NewAppWidget.class);
-        appWidgetManager.updateAppWidget(componentName, remoteViews);
-    }
 
     private DisplayImageOptions optionsWeather;
 

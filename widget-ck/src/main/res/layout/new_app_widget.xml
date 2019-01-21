@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/imgv_weather"
-            android:text="0℃"
+            android:text="N/A"
             android:textColor="#000000"
             android:textSize="20sp"
             />
@@ -73,7 +73,7 @@
             android:layout_marginTop="1dp"
             android:layout_toRightOf="@id/imgv_weather"
             android:gravity="center_vertical"
-            android:text="北京"
+            android:text="———"
             android:textColor="#000000"
             android:textSize="12sp"
             />
@@ -131,7 +131,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/tv_card"
         android:layout_below="@+id/re_weather"
         android:layout_marginTop="2dp"
         android:background="@drawable/shape_content_bg"
@@ -166,6 +165,24 @@
                 />
 
             <RelativeLayout
+                android:id="@+id/tv_card"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/progress_bar_layout">
+
+                <ImageView
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@mipmap/set"/>
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/progress_bar_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
@@ -250,18 +267,18 @@
             />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tv_card"
-        android:layout_width="match_parent"
-        android:layout_height="33dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/shape_card_bg"
-        android:gravity="center"
-        android:text="Card management"
-        android:textColor="#424242"
-        android:textSize="13sp"
-        />
+    <!--<TextView-->
+    <!--android:id="@+id/tv_card"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="33dp"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_marginTop="2dp"-->
+    <!--android:background="@drawable/shape_card_bg"-->
+    <!--android:gravity="center"-->
+    <!--android:text="Card management"-->
+    <!--android:textColor="#424242"-->
+    <!--android:textSize="13sp"-->
+    <!--/>-->
 
 
 </RelativeLayout>

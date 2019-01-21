@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginBottom="2dp"
+    android:layout_marginTop="2dp"
     >
 
 
@@ -12,9 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="142dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="9dp"
-        android:layout_marginRight="9dp"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:src="@mipmap/weather_snow"
         />
 
@@ -22,8 +22,6 @@
         android:id="@+id/tv_text_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="9dp"
-        android:layout_marginRight="15dp"
         android:layout_marginTop="7dp"
         android:ellipsize="end"
         android:maxLines="3"

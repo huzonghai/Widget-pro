@@ -3,6 +3,8 @@
     android:id="@+id/rl_widget_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginTop="2dp"
     android:orientation="horizontal"
     >
 
@@ -12,8 +14,7 @@
         android:layout_width="92dp"
         android:layout_height="67dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="9dp"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:src="@mipmap/weather_snow"
         />
 
@@ -23,7 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="9dp"
-        android:layout_marginRight="9dp"
         android:ellipsize="end"
         android:maxLines="3"
         android:text="2018/12/24"

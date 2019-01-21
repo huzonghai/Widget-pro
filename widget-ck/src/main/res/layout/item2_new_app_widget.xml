@@ -3,6 +3,8 @@
     android:id="@+id/rl_widget_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    android:layout_marginTop="2dp"
     android:orientation="vertical"
     >
 
@@ -16,11 +18,11 @@
             android:layout_width="0dp"
             android:layout_height="67dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="9dp"
             android:layout_weight="1"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@mipmap/weather_snow"
             />
+
 
         <ImageView
             android:id="@+id/imgv_pic_2_1"
@@ -39,7 +41,6 @@
             android:layout_width="0dp"
             android:layout_height="67dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="9dp"
             android:layout_weight="1"
             android:scaleType="fitXY"
             android:src="@mipmap/weather_snow"
@@ -53,8 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginBottom="7dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="4dp"
         android:layout_marginTop="7dp"
         android:ellipsize="end"
         android:maxLines="3"
@@ -62,5 +62,6 @@
         android:textColor="#ff424242"
         android:textSize="13sp"
         />
+
 
 </LinearLayout>

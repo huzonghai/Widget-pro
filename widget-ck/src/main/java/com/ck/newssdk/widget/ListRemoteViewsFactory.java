@@ -46,36 +46,26 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 .showImageOnLoading(R.mipmap.placeholder_figure)
                 .showImageForEmptyUri(R.mipmap.placeholder_figure)
                 .showImageOnFail(R.mipmap.placeholder_figure)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED )
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .displayer(new SimpleBitmapDisplayer())
                 .build();
+
+//        EXACTLY :图像将完全按比例缩小的目标大小
+//        EXACTLY_STRETCHED:图片会缩放到目标大小完全
+//        IN_SAMPLE_INT:图像将被二次采样的整数倍
+//        IN_SAMPLE_POWER_OF_2:图片将降低2倍，直到下一减少步骤，使图像更小的目标大小
+//        NONE:图片不会调整
     }
 
     @Override
     public void onCreate() {
         Log.i(TAG, "onCreate");
-//        initListViewData();
     }
 
-    /**
-     * 初始化数据
-     */
-    private static void initListViewData() {
-        mArticleListBeanList = NewAppWidget.getArticListData();
-        options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.mipmap.placeholder_figure)
-                .showImageForEmptyUri(R.mipmap.placeholder_figure)
-                .showImageOnFail(R.mipmap.placeholder_figure)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
-                .cacheOnDisk(true)
-                .cacheInMemory(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .displayer(new SimpleBitmapDisplayer())
-                .build();
-    }
+
 
 
     @Override

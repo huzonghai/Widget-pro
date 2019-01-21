@@ -171,11 +171,11 @@
                 android:layout_toLeftOf="@+id/progress_bar_layout">
 
                 <ImageView
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:layout_marginRight="6dp"
                     android:src="@mipmap/set"/>
 
             </RelativeLayout>
@@ -218,9 +218,16 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/tv_more"
             android:layout_below="@+id/re_refresh"
+            android:layout_marginLeft="9dp"
+            android:layout_marginRight="9dp"
             android:background="#00000000"
             android:dividerHeight="0.5dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:scrollbars="none"
+            />
+
+        <!--android:divider="@null"-->
+
 
         <include
             android:id="@+id/main_no_net"

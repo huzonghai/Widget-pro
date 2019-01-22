@@ -21,7 +21,7 @@ class HttpsFactroy {
     static SSLSocketFactory getSSLSocketFactory(Context context) {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509","BC");
-            InputStream caInput = context.getResources().openRawResource(R.raw.srca);
+            InputStream caInput = context.getResources().openRawResource(R.raw.coolook_org);
             Certificate ca;
             try {
                 ca = cf.generateCertificate(caInput);

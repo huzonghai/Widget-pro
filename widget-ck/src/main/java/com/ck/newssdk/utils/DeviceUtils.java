@@ -120,10 +120,16 @@ public class DeviceUtils {
     }
 
     public static String getUUID(Context context) {
-        String uuid = SharePDataBaseUtils.getUUID(context);
-        if (TextUtils.isEmpty(uuid)) {
-            uuid = MD5.MD5(UUID.randomUUID().toString());
-            SharePDataBaseUtils.saveUUID(context, uuid);
+        String uuid = null;
+        try {
+            uuid = SharePDataBaseUtils.getUUID(context);
+            if (TextUtils.isEmpty(uuid)) {
+                uuid = MD5.MD5(UUID.randomUUID().toString());
+                SharePDataBaseUtils.saveUUID(context, uuid);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return uuid;
     }

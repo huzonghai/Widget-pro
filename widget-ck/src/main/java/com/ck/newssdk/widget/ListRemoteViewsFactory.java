@@ -46,7 +46,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 .showImageOnLoading(R.mipmap.placeholder_figure)
                 .showImageForEmptyUri(R.mipmap.placeholder_figure)
                 .showImageOnFail(R.mipmap.placeholder_figure)
-                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED )
+                .imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -66,12 +66,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
 
-
-
     @Override
-    public RemoteViews getViewAt(int position) {
-        ArticleListBean articleListBean = mArticleListBeanList.get(position);
-        int itemType = articleListBean.getItemType();
+    public RemoteViews getViewAt(final int position) {
+        final ArticleListBean articleListBean = mArticleListBeanList.get(position);
+        final int itemType = articleListBean.getItemType();
+
         switch (itemType) {
             case IMG:
                 remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.item0_new_app_widget);
@@ -91,6 +90,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 remoteViews.setTextViewText(R.id.tv_text_2, articleListBean.getTitle());
                 break;
             default:
+
         }
 
         Intent fillInIntent = new Intent();
@@ -103,6 +103,8 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         remoteViews.setOnClickFillInIntent(R.id.rl_widget_item, fillInIntent);
 
         return remoteViews;
+
+
     }
 
     class NewBean {
@@ -131,7 +133,6 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
 
     }
-
 
 
     @Override

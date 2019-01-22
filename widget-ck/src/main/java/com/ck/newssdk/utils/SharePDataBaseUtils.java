@@ -58,21 +58,22 @@ public class SharePDataBaseUtils {
         return SharedPrefrencesUtil.getData(context, "XDKP", "ShowHint", "");
     }
 
-    public static boolean getIsFirstShowDialog(Context context) {
-        return SharedPrefrencesUtil.getData(context, "XDKP", "isFristDialog", false);
-    }
-
-    //是否是第一次加载Dialog
-    public static void saveIsFirstShowDialog(Context context, boolean isFrist) {
-        SharedPrefrencesUtil.saveData(context, "XDKP", "isFristDialog", isFrist);
-    }
 
     public static String getUUID(Context context) {
         return SharedPrefrencesUtil.getData(context, "XDKP", "uuid", "");
     }
 
-    //是否是第一次加载Dialog
     public static void saveUUID(Context context, String uuid) {
         SharedPrefrencesUtil.saveData(context, "XDKP", "uuid", uuid);
     }
+
+    //widget是否是首次
+    public static boolean getIsFirstShowWidget(Context context) {
+        return SharedPrefrencesUtil.getData(context, "XDKP", "isFristWidget", false);
+    }
+
+    public static void saveIsFirstShowWidget(Context context, boolean isFrist) {
+        SharedPrefrencesUtil.saveData(context, "XDKP", "isFristWidget", isFrist);
+    }
+
 }

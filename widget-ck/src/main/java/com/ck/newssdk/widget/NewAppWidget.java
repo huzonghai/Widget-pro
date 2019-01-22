@@ -26,6 +26,7 @@ import com.ck.newssdk.ui.web.WebActivity;
 import com.ck.newssdk.utils.DeviceUtils;
 import com.ck.newssdk.utils.Iml;
 import com.ck.newssdk.utils.JsonUtil;
+import com.ck.newssdk.utils.SharePDataBaseUtils;
 import com.ck.newssdk.utils.ThreadPoolExecutorUtils;
 import com.ck.newssdk.utils.imload.core.DisplayImageOptions;
 import com.ck.newssdk.utils.imload.core.ImageLoader;
@@ -95,12 +96,18 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
 
-                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+//                    if (articleListBeanList != null) {
+//                        remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+//                    }
 
                     if (isRefresh) {
                         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetManager.getAppWidgetIds(componentName), R.id.lv_news);
                         hideLoading(mContext);
                         isRefresh = false;
+                    }
+                    if (isFirstAddWidget()) {
+                        remoteViews.setViewVisibility(R.id.welcome_guide, View.GONE);
+                        SharePDataBaseUtils.saveIsFirstShowWidget(mContext, true);
                     }
                     Intent serviceIntent = new Intent(mContext, ListWidgetService.class);
                     remoteViews.setRemoteAdapter(R.id.lv_news, serviceIntent);
@@ -111,6 +118,7 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews.setPendingIntentTemplate(R.id.lv_news, pendingIntent);
                     long end = System.currentTimeMillis();
                     long time = end - bootAction;
+                    bootAction = System.currentTimeMillis();
                     System.out.println("AA Boot---getData  --时间间隔 ->" + time);
                     updateAppWidgetView();
                     appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
@@ -123,6 +131,14 @@ public class NewAppWidget extends AppWidgetProvider {
                         toast.show();
                         isBOOT = false;
                     }
+
+
+                    if (IOTil.isNetworkConnected(mContext)) {
+                        if (isFirstAddWidget()) {
+                            remoteViews.setViewVisibility(R.id.welcome_guide, View.GONE);
+                            SharePDataBaseUtils.saveIsFirstShowWidget(mContext, true);
+                        }
+                    }
                     updateAppWidgetView();
                     break;
                 case WEATHER_SUCCESS:
@@ -131,7 +147,6 @@ public class NewAppWidget extends AppWidgetProvider {
                     remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.new_app_widget);
                     Weather weather = (Weather) msg.obj;
 
-                    remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
                     remoteViews.setImageViewBitmap(R.id.imgv_weather, weather.bitmap);
                     remoteViews.setTextViewText(R.id.tv_weather_centigrade, weather.temp);
                     remoteViews.setTextViewText(R.id.tv_weather_week, weather.cityname);
@@ -173,6 +188,8 @@ public class NewAppWidget extends AppWidgetProvider {
         PendingIntent pendingIntentcard = PendingIntent.getBroadcast(context, 0, card, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.tv_card, pendingIntentcard);
         //更新widget
+
+
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
 
@@ -232,8 +249,8 @@ public class NewAppWidget extends AppWidgetProvider {
         } else if (action.equals(SEARCH_WIDGET)) {
             String url = "http://s.zlsite.com/?channel=50109";
             Intent startAcIntent = new Intent();
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.SearchAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.SearchAct"));
             startAcIntent.putExtra("url", url);
 //            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
@@ -244,14 +261,14 @@ public class NewAppWidget extends AppWidgetProvider {
             String countryCode = mContext.getResources().getConfiguration().locale.getCountry();
             Iml.setCountry(countryCode);
             Intent startAcIntent = new Intent();
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.ui.CkActivity"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.ui.CkActivity"));
 //            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_WIDGET)) {
             Intent startAcIntent = new Intent();
-//            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
-            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
+            startAcIntent.setComponent(new ComponentName("com.ssui.launcher3", "com.ck.newssdk.widget.CardManageAct"));
+//            startAcIntent.setComponent(new ComponentName("com.ck.widget", "com.ck.newssdk.widget.CardManageAct"));
 //            startAcIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(startAcIntent);
         } else if (action.equals(CARD_FORM_ACT)) {
@@ -264,7 +281,7 @@ public class NewAppWidget extends AppWidgetProvider {
                                 ? View.VISIBLE : View.GONE);
             }
         } else if (action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-            System.out.println("AA android.net.conn.CONNECTIVITY_CHANGE");
+//            System.out.println("AA android.net.conn.CONNECTIVITY_CHANGE");
 //            if (IOTil.isNetworkConnected(mContext)) {
 //                if (articleListBeanList == null) {
 //                    loadingData();
@@ -291,13 +308,13 @@ public class NewAppWidget extends AppWidgetProvider {
             initListViewDataFromLoca();
             initWeatherData();
         }
-        if (!IOTil.isNetworkConnected(mContext)) {
-            if (articleListBeanList == null) {
-                remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
-            }
-        } else {
-            remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
-        }
+//        if (!IOTil.isNetworkConnected(mContext)) {
+//            if (articleListBeanList == null) {
+//                remoteViews.setViewVisibility(R.id.main_no_net, View.VISIBLE);
+//            }
+//        } else {
+//            remoteViews.setViewVisibility(R.id.main_no_net, View.GONE);
+//        }
         appWidgetManager = AppWidgetManager.getInstance(context);
         componentName = new ComponentName(context, NewAppWidget.class);
         appWidgetManager.updateAppWidget(componentName, remoteViews);
@@ -365,6 +382,19 @@ public class NewAppWidget extends AppWidgetProvider {
 //        initListViewData();
 //        initWeatherData();
 //        initSearAndWeather();
+        if (isFirstAddWidget()) {
+            remoteViews = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
+            remoteViews.setViewVisibility(R.id.welcome_guide, View.VISIBLE);
+            refreshWidget(mContext, remoteViews, false);
+        }
+    }
+
+    private static boolean isFirstAddWidget() {
+        if (!SharePDataBaseUtils.getIsFirstShowWidget(mContext)
+                && articleListBeanList == null) {
+            return true;
+        }
+        return false;
     }
 
     private NewAppWidget mNewAppWidget;
@@ -381,6 +411,7 @@ public class NewAppWidget extends AppWidgetProvider {
     public void onDisabled(Context context) {
         mContext = context;
         Log.i(TAG, "onDisabled: 执行");
+        SharePDataBaseUtils.saveIsFirstShowWidget(mContext, false);
         if (mNewAppWidget != null) {
             mContext.unregisterReceiver(mNewAppWidget);
         }

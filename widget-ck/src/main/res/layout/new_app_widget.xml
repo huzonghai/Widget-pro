@@ -54,29 +54,35 @@
             />
         <!--android:src="@mipmap/weather_ic"-->
 
-        <TextView
-            android:id="@+id/tv_weather_centigrade"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_toRightOf="@id/imgv_weather"
-            android:text="N/A"
-            android:textColor="#000000"
-            android:textSize="20sp"
-            />
-
-        <TextView
-            android:id="@+id/tv_weather_week"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_weather_centigrade"
-            android:layout_marginTop="1dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
             android:layout_toRightOf="@id/imgv_weather"
             android:gravity="center_vertical"
-            android:text="———"
-            android:textColor="#000000"
-            android:textSize="12sp"
-            />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_weather_centigrade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="N/A"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_weather_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="———"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                />
+        </LinearLayout>
+
 
         <TextClock
             android:id="@+id/tv_weather_time"
@@ -228,6 +234,15 @@
 
         <!--android:divider="@null"-->
 
+        <include
+            android:id="@+id/welcome_guide"
+            layout="@layout/welcome_guide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tv_more"
+            android:layout_below="@+id/re_refresh"
+            android:visibility="gone"
+            />
 
         <include
             android:id="@+id/main_no_net"
